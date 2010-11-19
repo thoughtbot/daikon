@@ -2,18 +2,26 @@ module Daikon
   class Client
     include NamespaceTools
 
-    attr_accessor :redis, :logger
+    attr_accessor :redis, :logger, :config
 
-    def initialize(logger)
+    def initialize(config, logger)
+      @config = config
       @logger = logger
       @redis  = Redis.new
 
       logger.info "Started Daikon v#{VERSION}"
     end
 
-    def every
-      p "RUN STUFF!"
-      #Excon.get('http://geemus.com', :headers => {'Authorization' => 'Basic 0123456789ABCDEF'})
+    def fetch_commands
+      logger.info "fetch commands and run them"
+    end
+
+    def send_info
+      logger.info "sending INFO"
+    end
+
+    def rotate_monitor
+      logger.info "wrap up and truncate monitor log"
     end
 
     def evaluate_redis(command)
