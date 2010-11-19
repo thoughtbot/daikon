@@ -1,9 +1,15 @@
 require 'rubygems'
-require 'thor'
+require 'daemons'
 
-class Daikon < Thor
-  desc 'start', 'Start communication with Radish'
-  def start
-    p "hi!"
+class Diakon
+  def self.hello
+    puts "Hiya!"
+  end
+end
+
+Daemons.run_proc('daikon') do
+  loop do
+    Diakon.hello
+    sleep(5)
   end
 end
