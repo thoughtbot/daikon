@@ -1,6 +1,8 @@
 = daikon
 
-Client gem for http://radishapp.com
+Client gem for http://radishapp.com.
+
+Borrowed a bunch of code from https://github.com/alexmchale/try.redis, thanks!
 
 == Copyright
 
