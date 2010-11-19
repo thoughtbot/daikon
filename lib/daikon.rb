@@ -3,7 +3,6 @@ require 'logger'
 require 'shellwords'
 require 'socket'
 
-require 'excon'
 require 'daemons'
 require 'redis'
 
@@ -19,5 +18,5 @@ require 'daikon/client'
 require 'daikon/daemon'
 
 module Daikon
-  VERSION = "0.0.1"
+  VERSION = "0.0.0"
 end

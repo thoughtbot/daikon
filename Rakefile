@@ -13,7 +13,6 @@ Jeweler::Tasks.new do |gem|
   gem.email = "nick@quaran.to"
   gem.authors = ["Nick Quaranto"]
 
-  gem.add_runtime_dependency "excon",        "~> 0.2.4"
   gem.add_runtime_dependency "daemons",      "~> 1.0.0"
   gem.add_runtime_dependency "redis",        "~> 2.1.1"
   gem.add_runtime_dependency "system_timer", "= 1.0"
