@@ -93,8 +93,7 @@ module Daikon
       # Apply the current namespace to any fields that need it.
       argv = namespace_input(namespace, *argv)
 
-      # Issue the default help text if the command was not recognized.
-      raise "I'm sorry, I don't recognize that command.  #{help}" unless argv.kind_of? Array
+      raise "Not a Redis command." unless argv.kind_of? Array
 
       if result = bypass(argv)
         result
