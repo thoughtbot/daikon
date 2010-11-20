@@ -9,7 +9,7 @@ module Daikon
       self.logger = logger
       self.redis  = Redis.new(:port => config.redis_port)
       self.http   = Net::HTTP::Persistent.new
-      http.headers['Authorization'] = "deadbeef"
+      http.headers['Authorization'] = config.api_key
 
       log "Started Daikon v#{VERSION}"
     end

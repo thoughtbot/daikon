@@ -61,7 +61,6 @@ end
 
 describe Daikon::Client, "fetching commands" do
   subject       { Daikon::Client.new }
-  let(:api_key) { "deadbeef" }
   let(:body)    { {"42" => "INCR foo", "43" => "DECR foo"}.to_json }
 
   before do
@@ -74,15 +73,17 @@ describe Daikon::Client, "fetching commands" do
   end
 
   context "with default configuration" do
-    let(:server) { "https://radishapp.com" }
-    let(:config) { Daikon::Configuration.new([]) }
+    let(:api_key) { config.api_key }
+    let(:server)  { "https://radishapp.com" }
+    let(:config)  { Daikon::Configuration.new([]) }
 
     it_should_behave_like "a command api consumer"
   end
 
-  context "with custom server prefix" do
+  context "with custom settings" do
+    let(:api_key) { "0987654321" }
     let(:server)  { "http://localhost:9999" }
-    let(:config)  { Daikon::Configuration.new(["-s", "http://localhost:9999"]) }
+    let(:config)  { Daikon::Configuration.new(["-k", api_key, "-s", "http://localhost:9999"]) }
 
     it_should_behave_like "a command api consumer"
   end
