@@ -74,15 +74,15 @@ describe Daikon::Client, "fetching commands" do
   end
 
   context "with default configuration" do
-    let(:server) { "radishapp.com" }
+    let(:server) { "https://radishapp.com" }
     let(:config) { Daikon::Configuration.new([]) }
 
     it_should_behave_like "a command api consumer"
   end
 
   context "with custom server prefix" do
-    let(:server)  { "localhost:9999" }
-    let(:config)  { Daikon::Configuration.new(["-s", server]) }
+    let(:server)  { "http://localhost:9999" }
+    let(:config)  { Daikon::Configuration.new(["-s", "http://localhost:9999"]) }
 
     it_should_behave_like "a command api consumer"
   end

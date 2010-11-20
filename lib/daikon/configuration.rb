@@ -2,7 +2,7 @@ module Daikon
   class Configuration
     FLAGS    = %w[-p         -k         -f       -s]
     OPTIONS  = %w[redis_port api_key    field_id server_prefix]
-    DEFAULTS = %w[6379       1234567890 1        radishapp.com]
+    DEFAULTS = %w[6379       1234567890 1        https://radishapp.com]
 
     attr_accessor *OPTIONS
 

@@ -21,7 +21,7 @@ module Daikon
     def http_request(method, url)
       log "#{method.to_s.upcase} #{url}"
 
-      request_uri    = URI.parse("http://#{config.server_prefix}/#{url}")
+      request_uri    = URI.parse("#{config.server_prefix}/#{url}")
       request_method = Net::HTTP.const_get method.to_s.capitalize
       request        = request_method.new request_uri.path
 
