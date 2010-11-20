@@ -37,24 +37,9 @@ describe Daikon::Client, "setup" do
   end
 end
 
-describe Daikon::Client, "fetching commands" do
-  subject       { Daikon::Client.new }
-  let(:config)  { Daikon::Configuration.new([]) }
-  let(:api_key) { "deadbeef" }
-  let(:api_url) { "radishapp.com/api/v1/commands.json" }
-  let(:body)    { {"42" => "INCR foo", "43" => "DECR foo"}.to_json }
-
-  before do
-    subject.stubs(:evaluate_redis => "9999")
-    stub_request(:get, api_url).to_return(:body => body)
-    stub_request(:put, %r{radishapp\.com/api/v1/commands/\d+\.json})
-
-    subject.setup(config)
-    subject.fetch_commands
-  end
-
+shared_examples_for "a command api consumer" do
   it "sends a request for commands" do
-    WebMock.should have_requested(:get, api_url).
+    WebMock.should have_requested(:get, "#{server}/api/v1/commands.json").
       with(:headers => {'Authorization' => api_key})
   end
 
@@ -66,10 +51,39 @@ describe Daikon::Client, "fetching commands" do
   it "shoots the results back to radish" do
     results = {"response" => "9999"}.to_json
 
-    WebMock.should have_requested(:put, "radishapp.com/api/v1/commands/42.json").
+    WebMock.should have_requested(:put, "#{server}/api/v1/commands/42.json").
       with(:body => results, :headers => {'Authorization' => api_key})
 
-    WebMock.should have_requested(:put, "radishapp.com/api/v1/commands/43.json").
+    WebMock.should have_requested(:put, "#{server}/api/v1/commands/43.json").
       with(:body => results, :headers => {'Authorization' => api_key})
+  end
+end
+
+describe Daikon::Client, "fetching commands" do
+  subject       { Daikon::Client.new }
+  let(:api_key) { "deadbeef" }
+  let(:body)    { {"42" => "INCR foo", "43" => "DECR foo"}.to_json }
+
+  before do
+    subject.stubs(:evaluate_redis => "9999")
+    stub_request(:get, "#{server}/api/v1/commands.json").to_return(:body => body)
+    stub_request(:put, %r{#{server}/api/v1/commands/\d+\.json})
+
+    subject.setup(config)
+    subject.fetch_commands
+  end
+
+  context "with default configuration" do
+    let(:server) { "radishapp.com" }
+    let(:config) { Daikon::Configuration.new([]) }
+
+    it_should_behave_like "a command api consumer"
+  end
+
+  context "with custom server prefix" do
+    let(:server)  { "localhost:9999" }
+    let(:config)  { Daikon::Configuration.new(["-s", server]) }
+
+    it_should_behave_like "a command api consumer"
   end
 end
