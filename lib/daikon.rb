@@ -1,8 +1,10 @@
 require 'rubygems'
+require 'stringio'
 require 'logger'
 require 'shellwords'
 require 'socket'
 
+require 'system_timer'
 require 'daemons'
 require 'json'
 require 'net/http/persistent'

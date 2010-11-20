@@ -58,7 +58,7 @@ shared_examples_for "a command api consumer" do
     }
 
     WebMock.should have_requested(:put, "#{server}/api/v1/commands/42.json").
-      with(:body => results)
+      with(:body => results, :headers => headers)
 
     WebMock.should have_requested(:put, "#{server}/api/v1/commands/43.json").
       with(:body => results, :headers => headers)
@@ -120,5 +120,92 @@ describe Daikon::Client, "when it returns bad json" do
     lambda {
       subject.fetch_commands
     }.should_not raise_error
+  end
+end
+
+shared_examples_for "a info api consumer" do
+  it "shoots the results back to radish" do
+
+    headers = {
+      "Authorization"  => api_key,
+      "Content-Length" => results.to_json.size.to_s,
+      "Content-Type"   => "application/json"
+    }
+
+    WebMock.should have_requested(:post, "#{server}/api/v1/info.json").
+      with(:body => results.to_json, :headers => headers)
+  end
+end
+
+describe Daikon::Client, "report info" do
+  subject       { Daikon::Client.new }
+  let(:results) { {"connected_clients"=>"1", "used_cpu_sys_childrens"=>"0.00"}.to_json }
+  let(:redis)   { stub("redis instance", :info => results) }
+
+  before do
+    stub_request(:post, "#{server}/api/v1/info.json")
+    subject.stubs(:redis => redis)
+    subject.setup(config)
+    subject.report_info
+  end
+
+  context "with default configuration" do
+    let(:api_key) { config.api_key }
+    let(:server)  { "https://radishapp.com" }
+    let(:config)  { Daikon::Configuration.new }
+
+    it_should_behave_like "a info api consumer"
+  end
+
+  context "with custom settings" do
+    let(:api_key) { "0987654321" }
+    let(:server)  { "http://localhost:9999" }
+    let(:config)  { Daikon::Configuration.new(["-k", api_key, "-s", "http://localhost:9999"]) }
+
+    it_should_behave_like "a info api consumer"
+  end
+end
+
+shared_examples_for "a monitor api consumer" do
+  it "shoots the results back to radish" do
+    zipped_data = Gem.gzip(results)
+
+    headers = {
+      "Authorization"  => api_key,
+      "Content-Length" => zipped_data.size,
+      "Content-Type"   => "application/x-gzip"
+    }
+
+    WebMock.should have_requested(:post, "#{server}/api/v1/monitor").
+      with(:body => zipped_data, :headers => headers)
+  end
+end
+
+describe Daikon::Client, "rotate monitor" do
+  subject       { Daikon::Client.new }
+  let(:results) { %{1290289048.96581 "info"\n1290289053.568815 "info"} }
+  let(:redis)   { stub("redis instance", :info => results) }
+
+  before do
+    stub_request(:post, "#{server}/api/v1/monitor")
+    subject.monitor = StringIO.new(results)
+    subject.setup(config)
+    subject.rotate_monitor
+  end
+
+  context "with default configuration" do
+    let(:api_key) { config.api_key }
+    let(:server)  { "https://radishapp.com" }
+    let(:config)  { Daikon::Configuration.new }
+
+    it_should_behave_like "a monitor api consumer"
+  end
+
+  context "with custom settings" do
+    let(:api_key) { "0987654321" }
+    let(:server)  { "http://localhost:9999" }
+    let(:config)  { Daikon::Configuration.new(["-k", api_key, "-s", "http://localhost:9999"]) }
+
+    it_should_behave_like "a monitor api consumer"
   end
 end

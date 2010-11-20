@@ -12,7 +12,7 @@ module Daikon
                   Net::HTTP::Persistent::Error,
                   JSON::ParserError]
 
-    attr_accessor :redis, :logger, :config, :http
+    attr_accessor :redis, :logger, :config, :http, :monitor
 
     def setup(config, logger = nil)
       self.config = config
@@ -22,6 +22,15 @@ module Daikon
       http.headers['Authorization'] = config.api_key
 
       log "Started Daikon v#{VERSION}"
+    end
+
+    def start_monitor
+      self.monitor = StringIO.new
+      Thread.new do
+        Redis.new(:port => config.redis_port).monitor do |line|
+          monitor.puts line
+        end
+      end
     end
 
     def log(message)
@@ -56,12 +65,27 @@ module Daikon
       log ex.to_s
     end
 
-    def send_info
-      log "sending INFO"
+    def report_info
+      http_request(:post, "api/v1/info.json") do |request|
+        request.body = redis.info.to_json
+        request.add_field "Content-Length", request.body.size.to_s
+        request.add_field "Content-Type",   "application/json"
+      end
+    rescue *EXCEPTIONS => ex
+      log ex.to_s
     end
 
     def rotate_monitor
-      log "wrap up and truncate monitor log"
+      monitor_data = monitor.string
+      monitor.reopen(StringIO.new)
+
+      http_request(:post, "api/v1/monitor") do |request|
+        request.body = Gem.gzip(monitor_data)
+        request.add_field "Content-Length", request.body.size.to_s
+        request.add_field "Content-Type",   "application/x-gzip"
+      end
+    rescue *EXCEPTIONS => ex
+      log ex.to_s
     end
 
     def evaluate_redis(command)
@@ -95,44 +119,11 @@ module Daikon
 
       raise "Not a Redis command." unless argv.kind_of? Array
 
-      if result = bypass(argv)
-        result
-      else
-        # Send the command to Redis.
-        result = redis.send(*argv)
+      # Send the command to Redis.
+      result = redis.send(*argv)
 
-        # Remove the namespace from any commands that return a key.
-        denamespace_output namespace, argv.first, result
-      end
-    end
-
-    def bypass(argv)
-      queue = "transactions-#{namespace}"
-
-      if argv.first == "multi"
-        redis.del queue
-        redis.rpush queue, argv.to_json
-        return "OK"
-      elsif redis.llen(queue).to_i >= 1
-        redis.rpush queue, argv.to_json
-
-        if %w( discard exec ).include? argv.first
-          commands = redis.lrange(queue, 0, -1)
-          redis.del queue
-
-          return commands.map do |c|
-            cmd = JSON.parse(c)
-
-            # Send the command to Redis.
-            result = redis.send(*cmd)
-
-            # Remove the namespace from any commands that return a key.
-            denamespace_output namespace, cmd.first, result
-          end.last
-        end
-
-        return "QUEUED"
-      end
+      # Remove the namespace from any commands that return a key.
+      denamespace_output namespace, argv.first, result
     end
   end
 end
