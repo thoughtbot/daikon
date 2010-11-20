@@ -51,11 +51,17 @@ shared_examples_for "a command api consumer" do
   it "shoots the results back to radish" do
     results = {"response" => "9999"}.to_json
 
+    headers = {
+      "Authorization"  => api_key,
+      "Content-Length" => results.size.to_s,
+      "Content-Type"   => "application/json"
+    }
+
     WebMock.should have_requested(:put, "#{server}/api/v1/commands/42.json").
-      with(:body => results, :headers => {'Authorization' => api_key})
+      with(:body => results)
 
     WebMock.should have_requested(:put, "#{server}/api/v1/commands/43.json").
-      with(:body => results, :headers => {'Authorization' => api_key})
+      with(:body => results, :headers => headers)
   end
 end
 
@@ -64,7 +70,7 @@ describe Daikon::Client, "fetching commands" do
   let(:body)    { {"42" => "INCR foo", "43" => "DECR foo"}.to_json }
 
   before do
-    subject.stubs(:evaluate_redis => "9999")
+    subject.stubs(:evaluate_redis => {"response" => "9999"})
     stub_request(:get, "#{server}/api/v1/commands.json").to_return(:body => body)
     stub_request(:put, %r{#{server}/api/v1/commands/\d+\.json})
 

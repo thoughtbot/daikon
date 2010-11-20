@@ -19,14 +19,13 @@ module Daikon
     end
 
     def http_request(method, url)
-      log "#{method.to_s.upcase} #{url}"
-
       request_uri    = URI.parse("#{config.server_prefix}/#{url}")
       request_method = Net::HTTP.const_get method.to_s.capitalize
       request        = request_method.new request_uri.path
 
       yield request if block_given?
 
+      log "#{method.to_s.upcase} #{request_uri}"
       http.request request_uri, request
     end
 
@@ -38,7 +37,9 @@ module Daikon
         result = evaluate_redis(command)
 
         http_request(:put, "api/v1/commands/#{id}.json") do |request|
-          request.body = {"response" => result}.to_json
+          request.body = result.to_json
+          request.add_field "Content-Length", request.body.size.to_s
+          request.add_field "Content-Type",   "application/json"
         end
       end
     end
@@ -59,16 +60,16 @@ module Daikon
         rescue Exception => e
           STDERR.puts e.message
           e.backtrace.each {|bt| STDERR.puts bt}
-          return { "error" => e.message }
+          return { "response" => e.message }
         end
-      return { "error" => "No command received." } unless argv[0]
+      return { "response" => "No command received." } unless argv[0]
 
       begin
         { "response" => execute_redis(argv) }
       rescue Exception => e
         STDERR.puts e.message
         e.backtrace.each {|bt| STDERR.puts bt}
-        { "error" => e.message }
+        { "response" => e.message }
       end
     end
 

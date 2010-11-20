@@ -40,7 +40,7 @@ module Daikon
         result
 
       when "mget", "rpoplpush", "sinter", "sunion", "sdiff", "info",
-           "sinterstore", "sunionstore", "sdiffstore"
+           "sinterstore", "sunionstore", "sdiffstore", "dbsize"
 
         # All arguments are keys.
 
