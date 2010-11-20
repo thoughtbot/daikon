@@ -2,6 +2,16 @@ module Daikon
   class Client
     include NamespaceTools
 
+    EXCEPTIONS = [Timeout::Error,
+                  Errno::EINVAL,
+                  Errno::ECONNRESET,
+                  EOFError,
+                  Net::HTTPBadResponse,
+                  Net::HTTPHeaderSyntaxError,
+                  Net::ProtocolError,
+                  Net::HTTP::Persistent::Error,
+                  JSON::ParserError]
+
     attr_accessor :redis, :logger, :config, :http
 
     def setup(config, logger = nil)
@@ -42,6 +52,8 @@ module Daikon
           request.add_field "Content-Type",   "application/json"
         end
       end
+    rescue *EXCEPTIONS => ex
+      log ex.to_s
     end
 
     def send_info

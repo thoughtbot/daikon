@@ -94,3 +94,31 @@ describe Daikon::Client, "fetching commands" do
     it_should_behave_like "a command api consumer"
   end
 end
+
+describe Daikon::Client, "when server is down" do
+  subject       { Daikon::Client.new }
+  before do
+    subject.setup(Daikon::Configuration.new)
+    WebMock.stub_request(:any, /#{subject.config.server_prefix}.*/).to_raise(Timeout::Error)
+  end
+
+  it "does not commit suicide" do
+    lambda {
+      subject.fetch_commands
+    }.should_not raise_error
+  end
+end
+
+describe Daikon::Client, "when it returns bad json" do
+  subject       { Daikon::Client.new }
+  before do
+    subject.setup(Daikon::Configuration.new)
+    WebMock.stub_request(:any, /#{subject.config.server_prefix}.*/).to_return(:body => "{'bad':'json}")
+  end
+
+  it "does not commit suicide" do
+    lambda {
+      subject.fetch_commands
+    }.should_not raise_error
+  end
+end

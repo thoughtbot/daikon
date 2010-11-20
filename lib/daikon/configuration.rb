@@ -6,7 +6,7 @@ module Daikon
 
     attr_accessor *OPTIONS
 
-    def initialize(argv)
+    def initialize(argv = [])
       FLAGS.each_with_index do |flag, flag_index|
         argv_index = argv.index(flag)
         value = if argv_index
