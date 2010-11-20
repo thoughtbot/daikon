@@ -7,6 +7,9 @@ require 'daikon'
 # in ./support/ and its subdirectories.
 Dir["#{File.dirname(__FILE__)}/support/**/*.rb"].each {|f| require f}
 
+require 'bourne'
+require 'webmock/rspec'
+
 RSpec.configure do |config|
-  
+  config.mock_with :mocha
 end

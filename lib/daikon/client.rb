@@ -4,10 +4,10 @@ module Daikon
 
     attr_accessor :redis, :logger, :config
 
-    def initialize(config, logger)
-      @config = config
-      @logger = logger
-      @redis  = Redis.new
+    def setup(config, logger)
+      self.config = config
+      self.logger = logger
+      self.redis  = Redis.new(:port => config.redis_port)
 
       logger.info "Started Daikon v#{VERSION}"
     end
