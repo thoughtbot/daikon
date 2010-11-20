@@ -36,3 +36,40 @@ describe Daikon::Client, "setup" do
     end
   end
 end
+
+describe Daikon::Client, "fetching commands" do
+  subject       { Daikon::Client.new }
+  let(:config)  { Daikon::Configuration.new([]) }
+  let(:api_key) { "deadbeef" }
+  let(:api_url) { "radishapp.com/api/v1/commands.json" }
+  let(:body)    { {"42" => "INCR foo", "43" => "DECR foo"}.to_json }
+
+  before do
+    subject.stubs(:evaluate_redis => "9999")
+    stub_request(:get, api_url).to_return(:body => body)
+    stub_request(:put, %r{radishapp\.com/api/v1/commands/\d+\.json})
+
+    subject.setup(config)
+    subject.fetch_commands
+  end
+
+  it "sends a request for commands" do
+    WebMock.should have_requested(:get, api_url).
+      with(:headers => {'Authorization' => api_key})
+  end
+
+  it "processes each command" do
+    subject.should have_received(:evaluate_redis).with("INCR foo")
+    subject.should have_received(:evaluate_redis).with("DECR foo")
+  end
+
+  it "shoots the results back to radish" do
+    results = {"response" => "9999"}.to_json
+
+    WebMock.should have_requested(:put, "radishapp.com/api/v1/commands/42.json").
+      with(:body => results, :headers => {'Authorization' => api_key})
+
+    WebMock.should have_requested(:put, "radishapp.com/api/v1/commands/43.json").
+      with(:body => results, :headers => {'Authorization' => api_key})
+  end
+end

@@ -2,26 +2,53 @@ module Daikon
   class Client
     include NamespaceTools
 
-    attr_accessor :redis, :logger, :config
+    attr_accessor :redis, :logger, :config, :http
 
-    def setup(config, logger)
+    def setup(config, logger = nil)
       self.config = config
       self.logger = logger
       self.redis  = Redis.new(:port => config.redis_port)
+      self.http   = Net::HTTP::Persistent.new
+      http.headers['Authorization'] = "deadbeef"
 
-      logger.info "Started Daikon v#{VERSION}"
+      log "Started Daikon v#{VERSION}"
+    end
+
+    def log(message)
+      logger.info message if logger
+    end
+
+    def http_request(method, url)
+      log "#{method.to_s.upcase} #{url}"
+
+      request_uri    = URI.parse("http://radishapp.com/#{url}")
+      request_method = Net::HTTP.const_get method.to_s.capitalize
+      request        = request_method.new request_uri.path
+
+      yield request if block_given?
+
+      http.request request_uri, request
     end
 
     def fetch_commands
-      logger.info "fetch commands and run them"
+      raw_commands = http_request(:get, "api/v1/commands.json")
+      commands = JSON.parse(raw_commands.body)
+
+      commands.each do |id, command|
+        result = evaluate_redis(command)
+
+        http_request(:put, "api/v1/commands/#{id}.json") do |request|
+          request.body = {"response" => result}.to_json
+        end
+      end
     end
 
     def send_info
-      logger.info "sending INFO"
+      log "sending INFO"
     end
 
     def rotate_monitor
-      logger.info "wrap up and truncate monitor log"
+      log "wrap up and truncate monitor log"
     end
 
     def evaluate_redis(command)

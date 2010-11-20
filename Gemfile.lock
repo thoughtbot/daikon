@@ -23,8 +23,10 @@ GEM
       git (>= 1.2.5)
       rake
     json (1.4.6)
+    json_pure (1.4.6)
     mocha (0.9.8)
       rake
+    net-http-persistent (1.4.1)
     rake (0.8.7)
     redis (2.1.1)
     rspec (2.1.0)
@@ -49,6 +51,8 @@ DEPENDENCIES
   cucumber
   daemons (~> 1.0.0)
   jeweler
+  json_pure (~> 1.4.6)
+  net-http-persistent (~> 1.4.1)
   redis (~> 2.1.1)
   rspec
   system_timer (= 1.0)
