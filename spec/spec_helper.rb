@@ -15,3 +15,13 @@ WebMock.disable_net_connect!
 RSpec.configure do |config|
   config.mock_with :mocha
 end
+
+# http://pivotallabs.com/users/alex/blog/articles/853-capturing-standard-out-in-unit-tests
+def capture
+  output = StringIO.new
+  $stderr = output
+  yield
+  output.string
+ensure
+  $stderr = STDERR
+end

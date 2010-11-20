@@ -17,6 +17,10 @@ module Daikon
 
         send "#{OPTIONS[flag_index]}=", value
       end
+
+      if api_key == DEFAULTS[1] && argv.any? { |arg| arg =~ /start|run/ }
+        abort "Must supply an api key to start the daemon.\nExample: daikon start #{FLAGS[1]} #{DEFAULTS[1]}"
+      end
     end
   end
 end
