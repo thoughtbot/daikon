@@ -13,7 +13,7 @@ Jeweler::Tasks.new do |gem|
   gem.email = "nick@quaran.to"
   gem.authors = ["Nick Quaranto"]
 
-  gem.add_runtime_dependency "daemons",            "~> 1.0.0"
+  gem.add_runtime_dependency "daemons",            "~> 1.1.0"
   gem.add_runtime_dependency "json_pure",          "~> 1.4.6"
   gem.add_runtime_dependency "net-http-peristent", "~> 1.4.1"
   gem.add_runtime_dependency "redis",              "~> 2.1.1"

@@ -13,7 +13,7 @@ GEM
       gherkin (~> 2.2.9)
       json (~> 1.4.6)
       term-ansicolor (~> 1.0.5)
-    daemons (1.0.10)
+    daemons (1.1.0)
     diff-lcs (1.1.2)
     gherkin (2.2.9)
       json (~> 1.4.6)
@@ -50,7 +50,7 @@ DEPENDENCIES
   SystemTimer (~> 1.2.1)
   bourne
   cucumber
-  daemons (~> 1.0.0)
+  daemons (~> 1.1.0)
   jeweler
   json_pure (~> 1.4.6)
   net-http-persistent (~> 1.4.1)

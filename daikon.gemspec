@@ -9,19 +9,20 @@ Gem::Specification.new do |s|
 
   s.required_rubygems_version = Gem::Requirement.new(">= 0") if s.respond_to? :required_rubygems_version=
   s.authors = ["Nick Quaranto"]
-  s.date = %q{2010-11-19}
+  s.date = %q{2010-11-20}
   s.default_executable = %q{daikon}
   s.description = %q{daikon, a radishapp.com client}
   s.email = %q{nick@quaran.to}
   s.executables = ["daikon"]
   s.extra_rdoc_files = [
-    "LICENSE.txt",
     "README.rdoc"
   ]
   s.files = [
     ".document",
     ".rspec",
-    "LICENSE.txt",
+    "Gemfile",
+    "Gemfile.lock",
+    "MIT-LICENSE",
     "README.rdoc",
     "Rakefile",
     "VERSION",
@@ -57,26 +58,62 @@ Gem::Specification.new do |s|
     s.specification_version = 3
 
     if Gem::Version.new(Gem::VERSION) >= Gem::Version.new('1.2.0') then
-      s.add_runtime_dependency(%q<daemons>, ["~> 1.0.0"])
+      s.add_runtime_dependency(%q<daemons>, ["~> 1.1.0"])
+      s.add_runtime_dependency(%q<json_pure>, ["~> 1.4.6"])
+      s.add_runtime_dependency(%q<net-http-persistent>, ["~> 1.4.1"])
       s.add_runtime_dependency(%q<redis>, ["~> 2.1.1"])
-      s.add_runtime_dependency(%q<system_timer>, ["= 1.0"])
+      s.add_runtime_dependency(%q<SystemTimer>, ["~> 1.2.1"])
+      s.add_runtime_dependency(%q<rspec>, [">= 0"])
+      s.add_runtime_dependency(%q<cucumber>, [">= 0"])
+      s.add_runtime_dependency(%q<jeweler>, [">= 0"])
+      s.add_runtime_dependency(%q<bourne>, [">= 0"])
+      s.add_runtime_dependency(%q<webmock>, [">= 0"])
+      s.add_runtime_dependency(%q<daemons>, ["~> 1.1.0"])
+      s.add_runtime_dependency(%q<json_pure>, ["~> 1.4.6"])
+      s.add_runtime_dependency(%q<net-http-peristent>, ["~> 1.4.1"])
+      s.add_runtime_dependency(%q<redis>, ["~> 2.1.1"])
+      s.add_runtime_dependency(%q<SystemTimer>, ["~> 1.2.1"])
       s.add_development_dependency(%q<rspec>, ["~> 2.1.0"])
       s.add_development_dependency(%q<cucumber>, [">= 0"])
       s.add_development_dependency(%q<bundler>, ["~> 1.0.0"])
       s.add_development_dependency(%q<jeweler>, ["~> 1.5.1"])
     else
-      s.add_dependency(%q<daemons>, ["~> 1.0.0"])
+      s.add_dependency(%q<daemons>, ["~> 1.1.0"])
+      s.add_dependency(%q<json_pure>, ["~> 1.4.6"])
+      s.add_dependency(%q<net-http-persistent>, ["~> 1.4.1"])
       s.add_dependency(%q<redis>, ["~> 2.1.1"])
-      s.add_dependency(%q<system_timer>, ["= 1.0"])
+      s.add_dependency(%q<SystemTimer>, ["~> 1.2.1"])
+      s.add_dependency(%q<rspec>, [">= 0"])
+      s.add_dependency(%q<cucumber>, [">= 0"])
+      s.add_dependency(%q<jeweler>, [">= 0"])
+      s.add_dependency(%q<bourne>, [">= 0"])
+      s.add_dependency(%q<webmock>, [">= 0"])
+      s.add_dependency(%q<daemons>, ["~> 1.1.0"])
+      s.add_dependency(%q<json_pure>, ["~> 1.4.6"])
+      s.add_dependency(%q<net-http-peristent>, ["~> 1.4.1"])
+      s.add_dependency(%q<redis>, ["~> 2.1.1"])
+      s.add_dependency(%q<SystemTimer>, ["~> 1.2.1"])
       s.add_dependency(%q<rspec>, ["~> 2.1.0"])
       s.add_dependency(%q<cucumber>, [">= 0"])
       s.add_dependency(%q<bundler>, ["~> 1.0.0"])
       s.add_dependency(%q<jeweler>, ["~> 1.5.1"])
     end
   else
-    s.add_dependency(%q<daemons>, ["~> 1.0.0"])
+    s.add_dependency(%q<daemons>, ["~> 1.1.0"])
+    s.add_dependency(%q<json_pure>, ["~> 1.4.6"])
+    s.add_dependency(%q<net-http-persistent>, ["~> 1.4.1"])
     s.add_dependency(%q<redis>, ["~> 2.1.1"])
-    s.add_dependency(%q<system_timer>, ["= 1.0"])
+    s.add_dependency(%q<SystemTimer>, ["~> 1.2.1"])
+    s.add_dependency(%q<rspec>, [">= 0"])
+    s.add_dependency(%q<cucumber>, [">= 0"])
+    s.add_dependency(%q<jeweler>, [">= 0"])
+    s.add_dependency(%q<bourne>, [">= 0"])
+    s.add_dependency(%q<webmock>, [">= 0"])
+    s.add_dependency(%q<daemons>, ["~> 1.1.0"])
+    s.add_dependency(%q<json_pure>, ["~> 1.4.6"])
+    s.add_dependency(%q<net-http-peristent>, ["~> 1.4.1"])
+    s.add_dependency(%q<redis>, ["~> 2.1.1"])
+    s.add_dependency(%q<SystemTimer>, ["~> 1.2.1"])
     s.add_dependency(%q<rspec>, ["~> 2.1.0"])
     s.add_dependency(%q<cucumber>, [">= 0"])
     s.add_dependency(%q<bundler>, ["~> 1.0.0"])
