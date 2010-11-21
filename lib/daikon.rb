@@ -22,5 +22,5 @@ require 'daikon/client'
 require 'daikon/daemon'
 
 module Daikon
-  VERSION = "0.0.0"
+  VERSION = "0.1.0"
 end
