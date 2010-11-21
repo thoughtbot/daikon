@@ -5,7 +5,7 @@
 
 Gem::Specification.new do |s|
   s.name = %q{daikon}
-  s.version = "0.1.0"
+  s.version = "0.1.1"
 
   s.required_rubygems_version = Gem::Requirement.new(">= 0") if s.respond_to? :required_rubygems_version=
   s.authors = ["Nick Quaranto"]
@@ -63,20 +63,11 @@ Gem::Specification.new do |s|
       s.add_runtime_dependency(%q<net-http-persistent>, ["~> 1.4.1"])
       s.add_runtime_dependency(%q<redis>, ["~> 2.1.1"])
       s.add_runtime_dependency(%q<SystemTimer>, ["~> 1.2.1"])
-      s.add_runtime_dependency(%q<rspec>, [">= 0"])
-      s.add_runtime_dependency(%q<cucumber>, [">= 0"])
-      s.add_runtime_dependency(%q<jeweler>, [">= 0"])
-      s.add_runtime_dependency(%q<bourne>, [">= 0"])
-      s.add_runtime_dependency(%q<webmock>, [">= 0"])
-      s.add_runtime_dependency(%q<daemons>, ["~> 1.1.0"])
-      s.add_runtime_dependency(%q<json_pure>, ["~> 1.4.6"])
-      s.add_runtime_dependency(%q<net-http-persistent>, ["~> 1.4.1"])
-      s.add_runtime_dependency(%q<redis>, ["~> 2.1.1"])
-      s.add_runtime_dependency(%q<SystemTimer>, ["~> 1.2.1"])
-      s.add_development_dependency(%q<rspec>, ["~> 2.1.0"])
+      s.add_development_dependency(%q<rspec>, [">= 0"])
       s.add_development_dependency(%q<cucumber>, [">= 0"])
-      s.add_development_dependency(%q<bundler>, ["~> 1.0.0"])
-      s.add_development_dependency(%q<jeweler>, ["~> 1.5.1"])
+      s.add_development_dependency(%q<jeweler>, [">= 0"])
+      s.add_development_dependency(%q<bourne>, [">= 0"])
+      s.add_development_dependency(%q<webmock>, [">= 0"])
     else
       s.add_dependency(%q<daemons>, ["~> 1.1.0"])
       s.add_dependency(%q<json_pure>, ["~> 1.4.6"])
@@ -88,15 +79,6 @@ Gem::Specification.new do |s|
       s.add_dependency(%q<jeweler>, [">= 0"])
       s.add_dependency(%q<bourne>, [">= 0"])
       s.add_dependency(%q<webmock>, [">= 0"])
-      s.add_dependency(%q<daemons>, ["~> 1.1.0"])
-      s.add_dependency(%q<json_pure>, ["~> 1.4.6"])
-      s.add_dependency(%q<net-http-persistent>, ["~> 1.4.1"])
-      s.add_dependency(%q<redis>, ["~> 2.1.1"])
-      s.add_dependency(%q<SystemTimer>, ["~> 1.2.1"])
-      s.add_dependency(%q<rspec>, ["~> 2.1.0"])
-      s.add_dependency(%q<cucumber>, [">= 0"])
-      s.add_dependency(%q<bundler>, ["~> 1.0.0"])
-      s.add_dependency(%q<jeweler>, ["~> 1.5.1"])
     end
   else
     s.add_dependency(%q<daemons>, ["~> 1.1.0"])
@@ -109,15 +91,6 @@ Gem::Specification.new do |s|
     s.add_dependency(%q<jeweler>, [">= 0"])
     s.add_dependency(%q<bourne>, [">= 0"])
     s.add_dependency(%q<webmock>, [">= 0"])
-    s.add_dependency(%q<daemons>, ["~> 1.1.0"])
-    s.add_dependency(%q<json_pure>, ["~> 1.4.6"])
-    s.add_dependency(%q<net-http-persistent>, ["~> 1.4.1"])
-    s.add_dependency(%q<redis>, ["~> 2.1.1"])
-    s.add_dependency(%q<SystemTimer>, ["~> 1.2.1"])
-    s.add_dependency(%q<rspec>, ["~> 2.1.0"])
-    s.add_dependency(%q<cucumber>, [">= 0"])
-    s.add_dependency(%q<bundler>, ["~> 1.0.0"])
-    s.add_dependency(%q<jeweler>, ["~> 1.5.1"])
   end
 end
 

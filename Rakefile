@@ -12,17 +12,6 @@ Jeweler::Tasks.new do |gem|
   gem.summary = gem.description = %Q{daikon, a radishapp.com client}
   gem.email = "nick@quaran.to"
   gem.authors = ["Nick Quaranto"]
-
-  gem.add_runtime_dependency "daemons",             "~> 1.1.0"
-  gem.add_runtime_dependency "json_pure",           "~> 1.4.6"
-  gem.add_runtime_dependency "net-http-persistent", "~> 1.4.1"
-  gem.add_runtime_dependency "redis",               "~> 2.1.1"
-  gem.add_runtime_dependency "SystemTimer",         "~> 1.2.1"
-
-  gem.add_development_dependency "rspec",    "~> 2.1.0"
-  gem.add_development_dependency "cucumber", ">= 0"
-  gem.add_development_dependency "bundler",  "~> 1.0.0"
-  gem.add_development_dependency "jeweler",  "~> 1.5.1"
 end
 Jeweler::RubygemsDotOrgTasks.new
 

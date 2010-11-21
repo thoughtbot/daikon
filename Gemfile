@@ -6,8 +6,10 @@ gem "net-http-persistent", "~> 1.4.1"
 gem "redis",               "~> 2.1.1"
 gem "SystemTimer",         "~> 1.2.1"
 
-gem "rspec"
-gem "cucumber"
-gem "jeweler"
-gem "bourne"
-gem "webmock"
+group :development do
+  gem "rspec"
+  gem "cucumber"
+  gem "jeweler"
+  gem "bourne"
+  gem "webmock"
+end
