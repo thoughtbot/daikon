@@ -1,19 +1,19 @@
 module Daikon
   class Daemon
     def self.start
-      if ARGV.include?("run")
-        logger = Logger.new(STDOUT)
-      else
-        logger = Logger.new("/tmp/radish.log")
-      end
-
       config = Daikon::Configuration.new(ARGV)
-      client = Daikon::Client.new
-      client.setup(config, logger)
-      client.start_monitor
 
-      Daemons.run_proc('daikon') do
-        count = 0
+      Daemons.run_proc("daikon", :log_output => true, :backtrace => true) do
+        if ARGV.include?("run")
+          logger = Logger.new(STDOUT)
+        else
+          logger = Logger.new("/tmp/radish.log")
+        end
+
+        count  = 0
+        client = Daikon::Client.new
+        client.setup(config, logger)
+        client.start_monitor
 
         loop do
           if count % 5 == 0
