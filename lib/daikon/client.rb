@@ -54,9 +54,11 @@ module Daikon
 
       commands.each do |id, command|
         result = evaluate_redis(command)
+        pretty = StringIO.new
+        PP.pp(result, pretty)
 
         http_request(:put, "api/v1/commands/#{id}.json") do |request|
-          request.body = result.to_json
+          request.body = {"response" => pretty.string.strip}.to_json
           request.add_field "Content-Length", request.body.size.to_s
           request.add_field "Content-Type",   "application/json"
         end
@@ -96,16 +98,16 @@ module Daikon
         rescue Exception => e
           STDERR.puts e.message
           e.backtrace.each {|bt| STDERR.puts bt}
-          return { "response" => e.message }
+          return e.message
         end
-      return { "response" => "No command received." } unless argv[0]
+      return "No command received." unless argv[0]
 
       begin
-        { "response" => execute_redis(argv) }
+        execute_redis(argv)
       rescue Exception => e
         STDERR.puts e.message
         e.backtrace.each {|bt| STDERR.puts bt}
-        { "response" => e.message }
+        e.message
       end
     end
 

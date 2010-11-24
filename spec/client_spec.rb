@@ -70,7 +70,7 @@ describe Daikon::Client, "fetching commands" do
   let(:body)    { {"42" => "INCR foo", "43" => "DECR foo"}.to_json }
 
   before do
-    subject.stubs(:evaluate_redis => {"response" => "9999"})
+    subject.stubs(:evaluate_redis => 9999)
     stub_request(:get, "#{server}/api/v1/commands.json").to_return(:body => body)
     stub_request(:put, %r{#{server}/api/v1/commands/\d+\.json})
 
@@ -207,5 +207,26 @@ describe Daikon::Client, "rotate monitor" do
     let(:config)  { Daikon::Configuration.new(["-k", api_key, "-s", "http://localhost:9999"]) }
 
     it_should_behave_like "a monitor api consumer"
+  end
+end
+
+describe Daikon::Client, "pretty printing results" do
+  subject      { Daikon::Client.new }
+  let(:body)   { {"13" => "LRANGE foo 0 -1"}.to_json }
+  let(:list)   { %w[apples bananas carrots] }
+  let(:server) { "https://radishapp.com" }
+  let(:config) { Daikon::Configuration.new }
+
+  before do
+    subject.stubs(:evaluate_redis => list)
+    stub_request(:get, "#{server}/api/v1/commands.json").to_return(:body => body)
+    stub_request(:put, %r{#{server}/api/v1/commands/\d+\.json})
+    subject.setup(config)
+    subject.fetch_commands
+  end
+
+  it "returns pretty printed results" do
+    WebMock.should have_requested(:put, "#{server}/api/v1/commands/13.json").
+      with(:body => {"response" => "[\"apples\", \"bananas\", \"carrots\"]"})
   end
 end
