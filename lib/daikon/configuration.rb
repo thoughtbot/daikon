@@ -1,8 +1,8 @@
 module Daikon
   class Configuration
-    FLAGS    = %w[-p         -k         -f       -s]
-    OPTIONS  = %w[redis_port api_key    field_id server_prefix]
-    DEFAULTS = %w[6379       1234567890 1        https://radishapp.com]
+    FLAGS    = %w[-h         -p         -k         -f       -s]
+    OPTIONS  = %w[redis_host redis_port api_key    field_id server_prefix]
+    DEFAULTS = %w[127.0.0.1  6379       1234567890 1        https://radishapp.com]
 
     attr_accessor *OPTIONS
 
@@ -18,8 +18,8 @@ module Daikon
         send "#{OPTIONS[flag_index]}=", value
       end
 
-      if api_key == DEFAULTS[1] && argv.any? { |arg| arg =~ /start|run/ }
-        abort "Must supply an api key to start the daemon.\nExample: daikon start #{FLAGS[1]} #{DEFAULTS[1]}"
+      if api_key == DEFAULTS[2] && argv.any? { |arg| arg =~ /start|run/ }
+        abort "Must supply an api key to start the daemon.\nExample: daikon start #{FLAGS[2]} #{DEFAULTS[2]}"
       end
     end
   end

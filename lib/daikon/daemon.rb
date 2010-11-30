@@ -1,10 +1,15 @@
 module Daikon
   class Daemon
-    def self.start
-      config = Daikon::Configuration.new(ARGV)
+    def self.start(argv)
+      config = Daikon::Configuration.new(argv)
+
+      if argv.include?("-v") || argv.include?("--version")
+        puts "Daikon v#{VERSION}"
+        return
+      end
 
       Daemons.run_proc("daikon", :log_output => true, :backtrace => true) do
-        if ARGV.include?("run")
+        if argv.include?("run")
           logger = Logger.new(STDOUT)
         else
           logger = Logger.new("/tmp/radish.log")

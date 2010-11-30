@@ -2,4 +2,4 @@
 
 require File.join(File.dirname(__FILE__), '..', 'lib', 'daikon')
 
-Daikon::Daemon.start
+Daikon::Daemon.start(ARGV)

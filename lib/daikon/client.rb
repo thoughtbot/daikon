@@ -17,7 +17,7 @@ module Daikon
     def setup(config, logger = nil)
       self.config = config
       self.logger = logger
-      self.redis  = Redis.new(:port => config.redis_port)
+      self.redis  = Redis.new(:host => config.redis_host, :port => config.redis_port)
       self.http   = Net::HTTP::Persistent.new
       http.headers['Authorization'] = config.api_key
 

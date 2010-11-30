@@ -2,9 +2,10 @@ require 'spec_helper'
 
 describe Daikon::Configuration do
   subject     { Daikon::Configuration.new(flags) }
-  let(:flags) { %w[-p 9001 -k deadbeef -s localhost:9337 -f 1337] }
+  let(:flags) { %w[-h 4.2.2.2 -p 9001 -k deadbeef -s localhost:9337 -f 1337] }
 
   it "parses the given flags" do
+    subject.redis_host.should == "4.2.2.2"
     subject.redis_port.should == "9001"
     subject.api_key.should == "deadbeef"
     subject.field_id.should == "1337"
@@ -16,6 +17,7 @@ describe Daikon::Configuration do
   subject { Daikon::Configuration.new(%w[-k 1234567890]) }
 
   it "uses the default keys" do
+    subject.redis_host.should == "127.0.0.1"
     subject.redis_port.should == "6379"
     subject.api_key.should == "1234567890"
     subject.field_id.should == "1"
