@@ -25,5 +25,5 @@ require 'daikon/daemon'
 require 'daikon/redis_hacks'
 
 module Daikon
-  VERSION = "0.3.0"
+  VERSION = "0.4.0"
 end
