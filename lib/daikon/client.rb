@@ -17,17 +17,21 @@ module Daikon
     def setup(config, logger = nil)
       self.config = config
       self.logger = logger
-      self.redis  = Redis.new(:host => config.redis_host, :port => config.redis_port)
+      self.redis  = connect
       self.http   = Net::HTTP::Persistent.new
       http.headers['Authorization'] = config.api_key
 
       log "Started Daikon v#{VERSION}"
     end
 
+    def connect
+      Redis.new(:host => config.redis_host, :port => config.redis_port)
+    end
+
     def start_monitor
       self.monitor = StringIO.new
       Thread.new do
-        Redis.new(:port => config.redis_port).monitor do |line|
+        connect.monitor do |line|
           monitor.puts line
         end
       end
