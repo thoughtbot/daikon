@@ -5,11 +5,11 @@
 
 Gem::Specification.new do |s|
   s.name = %q{daikon}
-  s.version = "0.4.0"
+  s.version = "0.5.0"
 
   s.required_rubygems_version = Gem::Requirement.new(">= 0") if s.respond_to? :required_rubygems_version=
   s.authors = ["Nick Quaranto"]
-  s.date = %q{2010-12-06}
+  s.date = %q{2010-12-12}
   s.default_executable = %q{daikon}
   s.description = %q{daikon, a radishapp.com client}
   s.email = %q{nick@quaran.to}
@@ -25,7 +25,6 @@ Gem::Specification.new do |s|
     "MIT-LICENSE",
     "README.rdoc",
     "Rakefile",
-    "VERSION",
     "bin/daikon",
     "daikon.gemspec",
     "features/daikon.feature",
@@ -35,12 +34,14 @@ Gem::Specification.new do |s|
     "lib/daikon/client.rb",
     "lib/daikon/configuration.rb",
     "lib/daikon/daemon.rb",
+    "lib/daikon/monitor.rb",
     "lib/daikon/namespace_tools.rb",
     "lib/daikon/redis_hacks.rb",
     "spec/client_spec.rb",
     "spec/configuration_spec.rb",
     "spec/daemon_spec.rb",
     "spec/daikon_spec.rb",
+    "spec/monitor_spec.rb",
     "spec/spec_helper.rb"
   ]
   s.homepage = %q{http://github.com/qrush/daikon}
@@ -53,6 +54,7 @@ Gem::Specification.new do |s|
     "spec/configuration_spec.rb",
     "spec/daemon_spec.rb",
     "spec/daikon_spec.rb",
+    "spec/monitor_spec.rb",
     "spec/spec_helper.rb"
   ]
 
@@ -66,10 +68,11 @@ Gem::Specification.new do |s|
       s.add_runtime_dependency(%q<net-http-persistent>, ["~> 1.4.1"])
       s.add_runtime_dependency(%q<redis>, ["~> 2.1.1"])
       s.add_runtime_dependency(%q<SystemTimer>, ["~> 1.2.1"])
-      s.add_development_dependency(%q<rspec>, [">= 0"])
+      s.add_development_dependency(%q<bourne>, [">= 0"])
       s.add_development_dependency(%q<cucumber>, [">= 0"])
       s.add_development_dependency(%q<jeweler>, [">= 0"])
-      s.add_development_dependency(%q<bourne>, [">= 0"])
+      s.add_development_dependency(%q<rspec>, [">= 0"])
+      s.add_development_dependency(%q<timecop>, [">= 0"])
       s.add_development_dependency(%q<webmock>, [">= 0"])
     else
       s.add_dependency(%q<daemons>, ["~> 1.1.0"])
@@ -77,10 +80,11 @@ Gem::Specification.new do |s|
       s.add_dependency(%q<net-http-persistent>, ["~> 1.4.1"])
       s.add_dependency(%q<redis>, ["~> 2.1.1"])
       s.add_dependency(%q<SystemTimer>, ["~> 1.2.1"])
-      s.add_dependency(%q<rspec>, [">= 0"])
+      s.add_dependency(%q<bourne>, [">= 0"])
       s.add_dependency(%q<cucumber>, [">= 0"])
       s.add_dependency(%q<jeweler>, [">= 0"])
-      s.add_dependency(%q<bourne>, [">= 0"])
+      s.add_dependency(%q<rspec>, [">= 0"])
+      s.add_dependency(%q<timecop>, [">= 0"])
       s.add_dependency(%q<webmock>, [">= 0"])
     end
   else
@@ -89,10 +93,11 @@ Gem::Specification.new do |s|
     s.add_dependency(%q<net-http-persistent>, ["~> 1.4.1"])
     s.add_dependency(%q<redis>, ["~> 2.1.1"])
     s.add_dependency(%q<SystemTimer>, ["~> 1.2.1"])
-    s.add_dependency(%q<rspec>, [">= 0"])
+    s.add_dependency(%q<bourne>, [">= 0"])
     s.add_dependency(%q<cucumber>, [">= 0"])
     s.add_dependency(%q<jeweler>, [">= 0"])
-    s.add_dependency(%q<bourne>, [">= 0"])
+    s.add_dependency(%q<rspec>, [">= 0"])
+    s.add_dependency(%q<timecop>, [">= 0"])
     s.add_dependency(%q<webmock>, [">= 0"])
   end
 end
