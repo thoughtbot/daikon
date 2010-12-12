@@ -12,6 +12,7 @@ Jeweler::Tasks.new do |gem|
   gem.summary = gem.description = %Q{daikon, a radishapp.com client}
   gem.email = "nick@quaran.to"
   gem.authors = ["Nick Quaranto"]
+  gem.required_ruby_version = '>= 1.8.7'
 end
 Jeweler::RubygemsDotOrgTasks.new
 

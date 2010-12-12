@@ -47,6 +47,7 @@ Gem::Specification.new do |s|
   s.homepage = %q{http://github.com/qrush/daikon}
   s.licenses = ["MIT"]
   s.require_paths = ["lib"]
+  s.required_ruby_version = Gem::Requirement.new(">= 1.8.7")
   s.rubygems_version = %q{1.3.7}
   s.summary = %q{daikon, a radishapp.com client}
   s.test_files = [
