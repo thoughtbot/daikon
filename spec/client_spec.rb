@@ -173,10 +173,10 @@ shared_examples_for "a monitor api consumer" do
     headers = {
       "Authorization"  => api_key,
       "Content-Length" => payload.to_json.size,
-      "Content-Type"   => "application/x-gzip"
+      "Content-Type"   => "application/json"
     }
 
-    WebMock.should have_requested(:post, "#{server}/api/v1/monitor").
+    WebMock.should have_requested(:post, "#{server}/api/v1/monitor.json").
       with(:body => payload.to_json, :headers => headers)
   end
 end
@@ -191,7 +191,7 @@ describe Daikon::Client, "rotate monitor" do
   end
 
   before do
-    stub_request(:post, "#{server}/api/v1/monitor")
+    stub_request(:post, "#{server}/api/v1/monitor.json")
     subject.setup(config)
     subject.monitor = stub("monitor", :rotate => lines)
     subject.rotate_monitor

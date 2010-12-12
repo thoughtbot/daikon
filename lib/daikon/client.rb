@@ -19,7 +19,7 @@ module Daikon
       self.logger  = logger
       self.redis   = connect
       self.http    = Net::HTTP::Persistent.new
-      self.monitor = Monitor.new(connect)
+      self.monitor = Monitor.new(connect, logger)
       http.headers['Authorization'] = config.api_key
 
       log "Started Daikon v#{VERSION}"
@@ -80,10 +80,10 @@ module Daikon
     def rotate_monitor
       lines = monitor.rotate
 
-      http_request(:post, "api/v1/monitor") do |request|
+      http_request(:post, "api/v1/monitor.json") do |request|
         request.body = {"lines" => lines}.to_json
         request.add_field "Content-Length", request.body.size.to_s
-        request.add_field "Content-Type",   "application/x-gzip"
+        request.add_field "Content-Type",   "application/json"
       end
     rescue *EXCEPTIONS => ex
       log ex.to_s
