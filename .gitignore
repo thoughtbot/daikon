@@ -43,3 +43,4 @@ pkg
 
 *.output
 *.log
+*.pid
