@@ -186,8 +186,8 @@ describe Daikon::Client, "rotate monitor" do
   let(:results) { %{1290289048.96581 "info"\n1290289053.568815 "info"} }
   let(:redis)   { stub("redis instance", :info => results) }
   let(:lines) do
-    [{"at" => Time.at(1290289048, 96581),  "command" => "info"},
-     {"at" => Time.at(1290289053, 568815), "command" => "info"}]
+    [{"at" => 1290289048.96581,  "command" => "info"},
+     {"at" => 1290289053.568815, "command" => "info"}]
   end
 
   before do

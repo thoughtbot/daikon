@@ -26,12 +26,14 @@ module Daikon
 
     def parse(line)
       if line =~ NEW_FORMAT
-        timestamp = $1
-        line      = $2.strip
-        @queue.push({:at => Time.at(*timestamp.split('.').map(&:to_i)), :command => line})
+        push(Float($1), $2)
       elsif line =~ OLD_SINGLE_FORMAT || line =~ OLD_MORE_FORMAT
-        @queue.push({:at => Time.now, :command => line.strip})
+        push(Time.now.to_f, line)
       end
+    end
+
+    def push(at, command)
+      @queue.push({:at => at, :command => command.strip})
     end
   end
 end

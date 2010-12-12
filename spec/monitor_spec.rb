@@ -19,7 +19,7 @@ describe Daikon::Monitor, "#parse with new format" do
 
   it "parses the log into json" do
     subject.parse(line)
-    subject.queue.should include({:at => Time.at(1291699658, 994073), :command => '"decrby" "fooz" "2000"'})
+    subject.queue.should include({:at => 1291699658.994073, :command => '"decrby" "fooz" "2000"'})
   end
 end
 
@@ -35,9 +35,9 @@ describe Daikon::Monitor, "#parse with multiple inputs" do
     subject.parse("info")
 
     subject.queue.size.should == 3
-    subject.queue.should include({:at => Time.now, :command => 'INCR foo'})
-    subject.queue.should include({:at => Time.now, :command => 'INCR fooz'})
-    subject.queue.should include({:at => Time.now, :command => 'info'})
+    subject.queue.should include({:at => Time.now.to_f, :command => 'INCR foo'})
+    subject.queue.should include({:at => Time.now.to_f, :command => 'INCR fooz'})
+    subject.queue.should include({:at => Time.now.to_f, :command => 'info'})
   end
 end
 
@@ -53,9 +53,9 @@ describe Daikon::Monitor, "#parse with old multi line input" do
     subject.parse("decr foo")
 
     subject.queue.size.should == 3
-    subject.queue.should include({:at => Time.now, :command => 'incr foo'})
-    subject.queue.should include({:at => Time.now, :command => 'sismember project-13897-global-error-classes 17'})
-    subject.queue.should include({:at => Time.now, :command => 'decr foo'})
+    subject.queue.should include({:at => Time.now.to_f, :command => 'incr foo'})
+    subject.queue.should include({:at => Time.now.to_f, :command => 'sismember project-13897-global-error-classes 17'})
+    subject.queue.should include({:at => Time.now.to_f, :command => 'decr foo'})
   end
 end
 
@@ -71,9 +71,9 @@ describe Daikon::Monitor, "#parse with multi line input with numbers" do
     subject.parse("decr foo")
 
     subject.queue.size.should == 3
-    subject.queue.should include({:at => Time.now, :command => 'incr foo'})
-    subject.queue.should include({:at => Time.now, :command => 'set g:2470920:mrn 9'})
-    subject.queue.should include({:at => Time.now, :command => 'decr foo'})
+    subject.queue.should include({:at => Time.now.to_f, :command => 'incr foo'})
+    subject.queue.should include({:at => Time.now.to_f, :command => 'set g:2470920:mrn 9'})
+    subject.queue.should include({:at => Time.now.to_f, :command => 'decr foo'})
   end
 end
 
@@ -89,8 +89,8 @@ describe Daikon::Monitor, "#parse with strings that may to_i to a number" do
     subject.parse("decr foo")
 
     subject.queue.size.should == 3
-    subject.queue.should include({:at => Time.now, :command => 'incr foo'})
-    subject.queue.should include({:at => Time.now, :command => 'set g:2470920:mrn 9'})
-    subject.queue.should include({:at => Time.now, :command => 'decr foo'})
+    subject.queue.should include({:at => Time.now.to_f, :command => 'incr foo'})
+    subject.queue.should include({:at => Time.now.to_f, :command => 'set g:2470920:mrn 9'})
+    subject.queue.should include({:at => Time.now.to_f, :command => 'decr foo'})
   end
 end
