@@ -78,10 +78,10 @@ module Daikon
     end
 
     def rotate_monitor
-      monitor_data = monitor.rotate
+      lines = monitor.rotate
 
       http_request(:post, "api/v1/monitor") do |request|
-        request.body = monitor_data.to_json
+        request.body = {"lines" => lines}.to_json
         request.add_field "Content-Length", request.body.size.to_s
         request.add_field "Content-Type",   "application/x-gzip"
       end

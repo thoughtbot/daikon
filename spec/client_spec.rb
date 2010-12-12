@@ -168,14 +168,16 @@ end
 
 shared_examples_for "a monitor api consumer" do
   it "shoots the results back to radish" do
+    payload = {"lines" => lines}
+
     headers = {
       "Authorization"  => api_key,
-      "Content-Length" => body.to_json.size,
+      "Content-Length" => payload.to_json.size,
       "Content-Type"   => "application/x-gzip"
     }
 
     WebMock.should have_requested(:post, "#{server}/api/v1/monitor").
-      with(:body => body.to_json, :headers => headers)
+      with(:body => payload.to_json, :headers => headers)
   end
 end
 
@@ -183,7 +185,7 @@ describe Daikon::Client, "rotate monitor" do
   subject       { Daikon::Client.new }
   let(:results) { %{1290289048.96581 "info"\n1290289053.568815 "info"} }
   let(:redis)   { stub("redis instance", :info => results) }
-  let(:body) do
+  let(:lines) do
     [{"at" => Time.at(1290289048, 96581),  "command" => "info"},
      {"at" => Time.at(1290289053, 568815), "command" => "info"}]
   end
@@ -191,7 +193,7 @@ describe Daikon::Client, "rotate monitor" do
   before do
     stub_request(:post, "#{server}/api/v1/monitor")
     subject.setup(config)
-    subject.monitor = stub("monitor", :rotate => body)
+    subject.monitor = stub("monitor", :rotate => lines)
     subject.rotate_monitor
   end
 
