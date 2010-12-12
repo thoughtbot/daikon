@@ -18,7 +18,7 @@ describe Daikon::Client, "setup" do
     end
 
     it "sets redis to listen on the given port" do
-      Redis.should have_received(:new).with(:host => "8.8.8.8", :port => "1234")
+      Redis.should have_received(:new).with(:host => "8.8.8.8", :port => "1234").twice
       subject.should have_received(:redis=).with(redis)
     end
   end
@@ -31,7 +31,7 @@ describe Daikon::Client, "setup" do
     end
 
     it "sets redis to listen on the given port" do
-      Redis.should have_received(:new).with(:host => "127.0.0.1", :port => "6379")
+      Redis.should have_received(:new).with(:host => "127.0.0.1", :port => "6379").twice
       subject.should have_received(:redis=).with(redis)
     end
   end
@@ -168,16 +168,14 @@ end
 
 shared_examples_for "a monitor api consumer" do
   it "shoots the results back to radish" do
-    zipped_data = Gem.gzip(results)
-
     headers = {
       "Authorization"  => api_key,
-      "Content-Length" => zipped_data.size,
+      "Content-Length" => body.to_json.size,
       "Content-Type"   => "application/x-gzip"
     }
 
     WebMock.should have_requested(:post, "#{server}/api/v1/monitor").
-      with(:body => zipped_data, :headers => headers)
+      with(:body => body.to_json, :headers => headers)
   end
 end
 
@@ -185,11 +183,15 @@ describe Daikon::Client, "rotate monitor" do
   subject       { Daikon::Client.new }
   let(:results) { %{1290289048.96581 "info"\n1290289053.568815 "info"} }
   let(:redis)   { stub("redis instance", :info => results) }
+  let(:body) do
+    [{"at" => Time.at(1290289048, 96581),  "command" => "info"},
+     {"at" => Time.at(1290289053, 568815), "command" => "info"}]
+  end
 
   before do
     stub_request(:post, "#{server}/api/v1/monitor")
-    subject.monitor = StringIO.new(results)
     subject.setup(config)
+    subject.monitor = stub("monitor", :rotate => body)
     subject.rotate_monitor
   end
 

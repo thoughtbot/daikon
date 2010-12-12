@@ -22,6 +22,7 @@ require 'daikon/namespace_tools'
 require 'daikon/configuration'
 require 'daikon/client'
 require 'daikon/daemon'
+require 'daikon/monitor'
 require 'daikon/redis_hacks'
 
 module Daikon

@@ -7,6 +7,7 @@ require 'daikon'
 # in ./support/ and its subdirectories.
 Dir["#{File.dirname(__FILE__)}/support/**/*.rb"].each {|f| require f}
 
+require 'timecop'
 require 'bourne'
 
 require 'webmock/rspec'

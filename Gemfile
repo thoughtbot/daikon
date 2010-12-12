@@ -7,9 +7,10 @@ gem "redis",               "~> 2.1.1"
 gem "SystemTimer",         "~> 1.2.1"
 
 group :development do
-  gem "rspec"
+  gem "bourne"
   gem "cucumber"
   gem "jeweler"
-  gem "bourne"
+  gem "rspec"
+  gem "timecop"
   gem "webmock"
 end

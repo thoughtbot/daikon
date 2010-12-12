@@ -15,10 +15,11 @@ module Daikon
     attr_accessor :redis, :logger, :config, :http, :monitor
 
     def setup(config, logger = nil)
-      self.config = config
-      self.logger = logger
-      self.redis  = connect
-      self.http   = Net::HTTP::Persistent.new
+      self.config  = config
+      self.logger  = logger
+      self.redis   = connect
+      self.http    = Net::HTTP::Persistent.new
+      self.monitor = Monitor.new(connect)
       http.headers['Authorization'] = config.api_key
 
       log "Started Daikon v#{VERSION}"
@@ -29,12 +30,7 @@ module Daikon
     end
 
     def start_monitor
-      self.monitor = StringIO.new
-      Thread.new do
-        connect.monitor do |line|
-          monitor.puts line
-        end
-      end
+      monitor.start
     end
 
     def log(message)
@@ -82,11 +78,10 @@ module Daikon
     end
 
     def rotate_monitor
-      monitor_data = monitor.string
-      monitor.reopen(StringIO.new)
+      monitor_data = monitor.rotate
 
       http_request(:post, "api/v1/monitor") do |request|
-        request.body = Gem.gzip(monitor_data)
+        request.body = monitor_data.to_json
         request.add_field "Content-Length", request.body.size.to_s
         request.add_field "Content-Type",   "application/x-gzip"
       end

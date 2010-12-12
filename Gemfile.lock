@@ -39,6 +39,7 @@ GEM
       diff-lcs (~> 1.1.2)
     rspec-mocks (2.1.0)
     term-ansicolor (1.0.5)
+    timecop (0.3.5)
     webmock (1.6.1)
       addressable (>= 2.2.2)
       crack (>= 0.1.7)
@@ -56,4 +57,5 @@ DEPENDENCIES
   net-http-persistent (~> 1.4.1)
   redis (~> 2.1.1)
   rspec
+  timecop
   webmock
