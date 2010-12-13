@@ -23,6 +23,16 @@ describe Daikon::Monitor, "#parse with new format" do
   end
 end
 
+describe Daikon::Monitor, "#parse with new format that has reply byte" do
+  subject    { Daikon::Monitor.new }
+  let(:line) { '+1291699658.994073 "decrby" "fooz" "2000"' }
+
+  it "parses the log into json" do
+    subject.parse(line)
+    subject.queue.should include({:at => 1291699658.994073, :command => '"decrby" "fooz" "2000"'})
+  end
+end
+
 describe Daikon::Monitor, "#parse with multiple inputs" do
   subject { Daikon::Monitor.new }
   before  { Timecop.freeze }

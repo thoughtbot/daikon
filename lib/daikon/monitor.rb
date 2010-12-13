@@ -2,7 +2,7 @@ module Daikon
   class Monitor
     attr_accessor :queue
 
-    NEW_FORMAT        = /^(\d+\.\d+)( "[A-Z]+".*)/i
+    NEW_FORMAT        = /^\+?(\d+\.\d+)( "[A-Z]+".*)/i
     OLD_SINGLE_FORMAT = /^(QUIT|RANDOMKEY|DBSIZE|EXPIRE|TTL|SAVE|BGSAVE|SHUTDOWN|BGREWRITEAOF|INFO|MONITOR|SLAVEOF)$/i
     OLD_MORE_FORMAT   = /^[A-Z]+ .*$/i
 
