@@ -5,11 +5,11 @@
 
 Gem::Specification.new do |s|
   s.name = %q{daikon}
-  s.version = "0.5.3"
+  s.version = "0.5.4"
 
   s.required_rubygems_version = Gem::Requirement.new(">= 0") if s.respond_to? :required_rubygems_version=
   s.authors = ["Nick Quaranto"]
-  s.date = %q{2010-12-12}
+  s.date = %q{2010-12-16}
   s.default_executable = %q{daikon}
   s.description = %q{daikon, a radishapp.com client}
   s.email = %q{nick@quaran.to}
