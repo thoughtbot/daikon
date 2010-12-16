@@ -18,9 +18,11 @@ module Daikon
       self.config  = config
       self.logger  = logger
       self.redis   = connect
-      self.http    = Net::HTTP::Persistent.new
       self.monitor = Monitor.new(connect, logger)
-      http.headers['Authorization'] = config.api_key
+
+      self.http = Net::HTTP::Persistent.new
+      self.http.verify_mode = OpenSSL::SSL::VERIFY_PEER
+      self.http.headers['Authorization'] = config.api_key
 
       log "Started Daikon v#{VERSION}"
     end

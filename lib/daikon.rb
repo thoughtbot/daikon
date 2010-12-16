@@ -9,6 +9,7 @@ require 'stringio'
 require 'system_timer'
 require 'daemons'
 require 'json'
+require 'net/https'
 require 'net/http/persistent'
 require 'redis'
 
