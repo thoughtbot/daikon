@@ -6,7 +6,6 @@ require 'shellwords'
 require 'socket'
 require 'stringio'
 
-require 'system_timer'
 require 'daemons'
 require 'json'
 require 'net/https'
