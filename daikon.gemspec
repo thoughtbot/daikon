@@ -5,7 +5,7 @@
 
 Gem::Specification.new do |s|
   s.name = %q{daikon}
-  s.version = "0.5.10"
+  s.version = "0.6.0"
 
   s.required_rubygems_version = Gem::Requirement.new(">= 0") if s.respond_to? :required_rubygems_version=
   s.authors = ["Nick Quaranto"]
@@ -34,7 +34,6 @@ Gem::Specification.new do |s|
     "lib/daikon/client.rb",
     "lib/daikon/configuration.rb",
     "lib/daikon/daemon.rb",
-    "lib/daikon/heroku.crt",
     "lib/daikon/monitor.rb",
     "lib/daikon/namespace_tools.rb",
     "lib/daikon/redis_hacks.rb",
@@ -49,7 +48,7 @@ Gem::Specification.new do |s|
   s.licenses = ["MIT"]
   s.require_paths = ["lib"]
   s.required_ruby_version = Gem::Requirement.new(">= 1.8.7")
-  s.rubygems_version = %q{1.3.7}
+  s.rubygems_version = %q{1.4.1}
   s.summary = %q{daikon, a radishapp.com client}
   s.test_files = [
     "spec/client_spec.rb",
@@ -61,11 +60,11 @@ Gem::Specification.new do |s|
   ]
 
   if s.respond_to? :specification_version then
-    current_version = Gem::Specification::CURRENT_SPECIFICATION_VERSION
     s.specification_version = 3
 
     if Gem::Version.new(Gem::VERSION) >= Gem::Version.new('1.2.0') then
       s.add_runtime_dependency(%q<daemons>, ["~> 1.1.0"])
+      s.add_runtime_dependency(%q<excon>, ["~> 0.3.8"])
       s.add_runtime_dependency(%q<json_pure>, ["~> 1.4.6"])
       s.add_runtime_dependency(%q<redis>, ["~> 2.1.1"])
       s.add_development_dependency(%q<bourne>, [">= 0"])
@@ -73,9 +72,9 @@ Gem::Specification.new do |s|
       s.add_development_dependency(%q<jeweler>, [">= 0"])
       s.add_development_dependency(%q<rspec>, [">= 0"])
       s.add_development_dependency(%q<timecop>, [">= 0"])
-      s.add_development_dependency(%q<webmock>, [">= 0"])
     else
       s.add_dependency(%q<daemons>, ["~> 1.1.0"])
+      s.add_dependency(%q<excon>, ["~> 0.3.8"])
       s.add_dependency(%q<json_pure>, ["~> 1.4.6"])
       s.add_dependency(%q<redis>, ["~> 2.1.1"])
       s.add_dependency(%q<bourne>, [">= 0"])
@@ -83,10 +82,10 @@ Gem::Specification.new do |s|
       s.add_dependency(%q<jeweler>, [">= 0"])
       s.add_dependency(%q<rspec>, [">= 0"])
       s.add_dependency(%q<timecop>, [">= 0"])
-      s.add_dependency(%q<webmock>, [">= 0"])
     end
   else
     s.add_dependency(%q<daemons>, ["~> 1.1.0"])
+    s.add_dependency(%q<excon>, ["~> 0.3.8"])
     s.add_dependency(%q<json_pure>, ["~> 1.4.6"])
     s.add_dependency(%q<redis>, ["~> 2.1.1"])
     s.add_dependency(%q<bourne>, [">= 0"])
@@ -94,7 +93,6 @@ Gem::Specification.new do |s|
     s.add_dependency(%q<jeweler>, [">= 0"])
     s.add_dependency(%q<rspec>, [">= 0"])
     s.add_dependency(%q<timecop>, [">= 0"])
-    s.add_dependency(%q<webmock>, [">= 0"])
   end
 end
 
