@@ -5,7 +5,7 @@
 
 Gem::Specification.new do |s|
   s.name = %q{daikon}
-  s.version = "0.5.8"
+  s.version = "0.5.9"
 
   s.required_rubygems_version = Gem::Requirement.new(">= 0") if s.respond_to? :required_rubygems_version=
   s.authors = ["Nick Quaranto"]
@@ -37,6 +37,7 @@ Gem::Specification.new do |s|
     "lib/daikon/monitor.rb",
     "lib/daikon/namespace_tools.rb",
     "lib/daikon/redis_hacks.rb",
+    "lib/daikon/ssl_radishapp_com.crt",
     "spec/client_spec.rb",
     "spec/configuration_spec.rb",
     "spec/daemon_spec.rb",
