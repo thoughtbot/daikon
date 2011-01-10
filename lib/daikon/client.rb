@@ -22,6 +22,7 @@ module Daikon
 
       self.http = Net::HTTP::Persistent.new
       self.http.verify_mode = OpenSSL::SSL::VERIFY_PEER
+      self.http.use_ssl = true
       self.http.headers['Authorization'] = config.api_key
 
       log "Started Daikon v#{VERSION}"
