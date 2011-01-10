@@ -25,7 +25,7 @@ module Daikon
       if server_uri.scheme == "https"
         self.http.verify_mode = OpenSSL::SSL::VERIFY_PEER
         self.http.use_ssl = true
-        self.http.ca_file = File.join(File.dirname(__FILE__), "ssl_radishapp_com.crt")
+        self.http.ca_file = File.join(File.dirname(__FILE__), "heroku.crt")
       end
 
       log "Started Daikon v#{VERSION}"

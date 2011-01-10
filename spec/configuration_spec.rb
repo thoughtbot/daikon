@@ -21,7 +21,7 @@ describe Daikon::Configuration do
     subject.redis_port.should == "6379"
     subject.api_key.should == "1234567890"
     subject.field_id.should == "1"
-    subject.server_prefix == "radishapp.com"
+    subject.server_prefix == "radish.heroku.com"
   end
 end
 
@@ -51,6 +51,6 @@ describe Daikon::Configuration do
     subject.redis_port.should == "9001"
     subject.api_key.should == "deadbeef"
     subject.field_id.should == "1"
-    subject.server_prefix == "radishapp.com"
+    subject.server_prefix == "radish.heroku.com"
   end
 end

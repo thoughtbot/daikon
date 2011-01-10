@@ -2,7 +2,7 @@ module Daikon
   class Configuration
     FLAGS    = %w[-h         -p         -k         -f       -s]
     OPTIONS  = %w[redis_host redis_port api_key    field_id server_prefix]
-    DEFAULTS = %w[127.0.0.1  6379       1234567890 1        https://ssl.radishapp.com]
+    DEFAULTS = %w[127.0.0.1  6379       1234567890 1        https://radish.heroku.com]
 
     attr_accessor *OPTIONS
 

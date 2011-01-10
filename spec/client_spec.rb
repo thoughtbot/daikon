@@ -80,7 +80,7 @@ describe Daikon::Client, "fetching commands" do
 
   context "with default configuration" do
     let(:api_key) { config.api_key }
-    let(:server)  { "https://ssl.radishapp.com" }
+    let(:server)  { "https://radish.heroku.com" }
     let(:config)  { Daikon::Configuration.new([]) }
 
     it_should_behave_like "a command api consumer"
@@ -151,7 +151,7 @@ describe Daikon::Client, "report info" do
 
   context "with default configuration" do
     let(:api_key) { config.api_key }
-    let(:server)  { "https://ssl.radishapp.com" }
+    let(:server)  { "https://radish.heroku.com" }
     let(:config)  { Daikon::Configuration.new }
 
     it_should_behave_like "a info api consumer"
@@ -199,7 +199,7 @@ describe Daikon::Client, "rotate monitor" do
 
   context "with default configuration" do
     let(:api_key) { config.api_key }
-    let(:server)  { "https://ssl.radishapp.com" }
+    let(:server)  { "https://radish.heroku.com" }
     let(:config)  { Daikon::Configuration.new }
 
     it_should_behave_like "a monitor api consumer"
@@ -218,7 +218,7 @@ describe Daikon::Client, "pretty printing results" do
   subject      { Daikon::Client.new }
   let(:body)   { {"13" => "LRANGE foo 0 -1"}.to_json }
   let(:list)   { %w[apples bananas carrots] }
-  let(:server) { "https://ssl.radishapp.com" }
+  let(:server) { "https://radish.heroku.com" }
   let(:config) { Daikon::Configuration.new }
 
   before do
