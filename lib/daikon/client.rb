@@ -9,7 +9,6 @@ module Daikon
                   Net::HTTPBadResponse,
                   Net::HTTPHeaderSyntaxError,
                   Net::ProtocolError,
-                  Net::HTTP::Persistent::Error,
                   JSON::ParserError]
 
     attr_accessor :redis, :logger, :config, :http, :monitor
@@ -20,10 +19,13 @@ module Daikon
       self.redis   = connect
       self.monitor = Monitor.new(connect, logger)
 
-      self.http = Net::HTTP::Persistent.new
-      self.http.verify_mode = OpenSSL::SSL::VERIFY_PEER
-      self.http.use_ssl = true
-      self.http.headers['Authorization'] = config.api_key
+      server_uri = URI.parse(config.server_prefix)
+      self.http  = Net::HTTP.new(server_uri.host, server_uri.port)
+
+      if server_uri.scheme == "https"
+        self.http.verify_mode = OpenSSL::SSL::VERIFY_PEER
+        self.http.use_ssl = true
+      end
 
       log "Started Daikon v#{VERSION}"
     end
@@ -41,14 +43,15 @@ module Daikon
     end
 
     def http_request(method, url)
-      request_uri    = URI.parse("#{config.server_prefix}/#{url}")
+      uri            = URI.parse("#{config.server_prefix}/#{url}")
       request_method = Net::HTTP.const_get method.to_s.capitalize
-      request        = request_method.new request_uri.path
+      request        = request_method.new uri.request_uri
+      request.add_field 'Authorization', config.api_key
 
       yield request if block_given?
 
-      log "#{method.to_s.upcase} #{request_uri}"
-      http.request request_uri, request
+      log "#{method.to_s.upcase} #{uri.to_s}"
+      http.request request
     end
 
     def fetch_commands

@@ -9,7 +9,6 @@ require 'stringio'
 require 'daemons'
 require 'json'
 require 'net/https'
-require 'net/http/persistent'
 require 'redis'
 
 __DIR__ = File.dirname(__FILE__)

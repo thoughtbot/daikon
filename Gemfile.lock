@@ -26,7 +26,6 @@ GEM
     json_pure (1.4.6)
     mocha (0.9.8)
       rake
-    net-http-persistent (1.4.1)
     rake (0.8.7)
     redis (2.1.1)
     rspec (2.1.0)
@@ -52,7 +51,6 @@ DEPENDENCIES
   daemons (~> 1.1.0)
   jeweler
   json_pure (~> 1.4.6)
-  net-http-persistent (~> 1.4.1)
   redis (~> 2.1.1)
   rspec
   timecop
