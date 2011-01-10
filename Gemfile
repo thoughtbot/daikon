@@ -1,8 +1,9 @@
 source "http://rubygems.org"
 
-gem "daemons",             "~> 1.1.0"
-gem "json_pure",           "~> 1.4.6"
-gem "redis",               "~> 2.1.1"
+gem "daemons",   "~> 1.1.0"
+gem "excon",     "~> 0.3.8"
+gem "json_pure", "~> 1.4.6"
+gem "redis",     "~> 2.1.1"
 
 group :development do
   gem "bourne"
@@ -10,5 +11,4 @@ group :development do
   gem "jeweler"
   gem "rspec"
   gem "timecop"
-  gem "webmock"
 end

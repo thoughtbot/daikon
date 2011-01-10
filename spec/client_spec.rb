@@ -39,8 +39,10 @@ end
 
 shared_examples_for "a command api consumer" do
   it "sends a request for commands" do
-    WebMock.should have_requested(:get, "#{server}/api/v1/commands.json").
-      with(:headers => {'Authorization' => api_key})
+    http.should have_received(:request).with(
+      :method  => "GET",
+      :path    => "/api/v1/commands.json",
+      :headers => {"Authorization" => api_key})
   end
 
   it "processes each command" do
@@ -57,22 +59,28 @@ shared_examples_for "a command api consumer" do
       "Content-Type"   => "application/json"
     }
 
-    WebMock.should have_requested(:put, "#{server}/api/v1/commands/42.json").
-      with(:body => results, :headers => headers)
+    http.should have_received(:request).with(
+      :method  => "PUT",
+      :path    => "/api/v1/commands/42.json",
+      :body    => results,
+      :headers => headers)
 
-    WebMock.should have_requested(:put, "#{server}/api/v1/commands/43.json").
-      with(:body => results, :headers => headers)
+    http.should have_received(:request).with(
+      :method  => "PUT",
+      :path    => "/api/v1/commands/43.json",
+      :body    => results,
+      :headers => headers)
   end
 end
 
 describe Daikon::Client, "fetching commands" do
   subject       { Daikon::Client.new }
   let(:body)    { {"42" => "INCR foo", "43" => "DECR foo"}.to_json }
+  let(:http)    { stub("http", :request => Excon::Response.new(:body => body)) }
 
   before do
     subject.stubs(:evaluate_redis => 9999)
-    stub_request(:get, "#{server}/api/v1/commands.json").to_return(:body => body)
-    stub_request(:put, %r{#{server}/api/v1/commands/\d+\.json})
+    subject.stubs(:http => http)
 
     subject.setup(config)
     subject.fetch_commands
@@ -99,7 +107,9 @@ describe Daikon::Client, "when server is down" do
   subject       { Daikon::Client.new }
   before do
     subject.setup(Daikon::Configuration.new)
-    WebMock.stub_request(:any, /#{subject.config.server_prefix}.*/).to_raise(Timeout::Error)
+    http = stub("http")
+    http.stubs(:request).raises(Timeout::Error)
+    subject.stubs(:http => http)
   end
 
   it "does not commit suicide" do
@@ -113,7 +123,8 @@ describe Daikon::Client, "when it returns bad json" do
   subject       { Daikon::Client.new }
   before do
     subject.setup(Daikon::Configuration.new)
-    WebMock.stub_request(:any, /#{subject.config.server_prefix}.*/).to_return(:body => "{'bad':'json}")
+    http = stub("http", :request => Excon::Response.new(:body => "{'bad':'json}"))
+    subject.stubs(:http => http)
   end
 
   it "does not commit suicide" do
@@ -125,26 +136,28 @@ end
 
 shared_examples_for "a info api consumer" do
   it "shoots the results back to radish" do
-
     headers = {
       "Authorization"  => api_key,
       "Content-Length" => results.to_json.size.to_s,
       "Content-Type"   => "application/json"
     }
 
-    WebMock.should have_requested(:post, "#{server}/api/v1/info.json").
-      with(:body => results.to_json, :headers => headers)
+    http.should have_received(:request).with(
+      :method  => "POST",
+      :path    => "/api/v1/info.json",
+      :body    => results.to_json,
+      :headers => headers)
   end
 end
 
 describe Daikon::Client, "report info" do
   subject       { Daikon::Client.new }
-  let(:results) { {"connected_clients"=>"1", "used_cpu_sys_childrens"=>"0.00"}.to_json }
+  let(:results) { {"connected_clients"=>"1", "used_cpu_sys_childrens"=>"0.00"} }
   let(:redis)   { stub("redis instance", :info => results) }
+  let(:http)    { stub("http", :request => Excon::Response.new) }
 
   before do
-    stub_request(:post, "#{server}/api/v1/info.json")
-    subject.stubs(:redis => redis)
+    subject.stubs(:redis => redis, :http => http)
     subject.setup(config)
     subject.report_info
   end
@@ -172,12 +185,15 @@ shared_examples_for "a monitor api consumer" do
 
     headers = {
       "Authorization"  => api_key,
-      "Content-Length" => payload.to_json.size,
+      "Content-Length" => payload.to_json.size.to_s,
       "Content-Type"   => "application/json"
     }
 
-    WebMock.should have_requested(:post, "#{server}/api/v1/monitor.json").
-      with(:body => payload.to_json, :headers => headers)
+    http.should have_received(:request).with(
+      :method  => "POST",
+      :path    => "/api/v1/monitor.json",
+      :body    => payload.to_json,
+      :headers => headers)
   end
 end
 
@@ -185,13 +201,14 @@ describe Daikon::Client, "rotate monitor" do
   subject       { Daikon::Client.new }
   let(:results) { %{1290289048.96581 "info"\n1290289053.568815 "info"} }
   let(:redis)   { stub("redis instance", :info => results) }
+  let(:http)    { stub("http", :request => Excon::Response.new) }
   let(:lines) do
     [{"at" => 1290289048.96581,  "command" => "info"},
      {"at" => 1290289053.568815, "command" => "info"}]
   end
 
   before do
-    stub_request(:post, "#{server}/api/v1/monitor.json")
+    subject.stubs(:http => http)
     subject.setup(config)
     subject.monitor = stub("monitor", :rotate => lines)
     subject.rotate_monitor
@@ -220,17 +237,17 @@ describe Daikon::Client, "pretty printing results" do
   let(:list)   { %w[apples bananas carrots] }
   let(:server) { "https://radish.heroku.com" }
   let(:config) { Daikon::Configuration.new }
+  let(:http)   { stub("http", :request => Excon::Response.new(:body => body)) }
 
   before do
-    subject.stubs(:evaluate_redis => list)
-    stub_request(:get, "#{server}/api/v1/commands.json").to_return(:body => body)
-    stub_request(:put, %r{#{server}/api/v1/commands/\d+\.json})
+    subject.stubs(:evaluate_redis => list, :http => http)
     subject.setup(config)
     subject.fetch_commands
   end
 
   it "returns pretty printed results" do
-    WebMock.should have_requested(:put, "#{server}/api/v1/commands/13.json").
-      with(:body => {"response" => "[\"apples\", \"bananas\", \"carrots\"]"})
+    http.should have_received(:request).with(has_entry(
+      :body => {"response" => "[\"apples\", \"bananas\", \"carrots\"]"}.to_json
+    ))
   end
 end

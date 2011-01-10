@@ -6,9 +6,6 @@ module Daikon
                   Errno::EINVAL,
                   Errno::ECONNRESET,
                   EOFError,
-                  Net::HTTPBadResponse,
-                  Net::HTTPHeaderSyntaxError,
-                  Net::ProtocolError,
                   JSON::ParserError]
 
     attr_accessor :redis, :logger, :config, :http, :monitor
@@ -18,15 +15,7 @@ module Daikon
       self.logger  = logger
       self.redis   = connect
       self.monitor = Monitor.new(connect, logger)
-
-      server_uri = URI.parse(config.server_prefix)
-      self.http  = Net::HTTP.new(server_uri.host, server_uri.port)
-
-      if server_uri.scheme == "https"
-        self.http.verify_mode = OpenSSL::SSL::VERIFY_PEER
-        self.http.use_ssl = true
-        self.http.ca_file = File.join(File.dirname(__FILE__), "heroku.crt")
-      end
+      self.http    = Excon.new(config.server_prefix)
 
       log "Started Daikon v#{VERSION}"
     end
@@ -43,20 +32,26 @@ module Daikon
       logger.info message if logger
     end
 
-    def http_request(method, url)
-      uri            = URI.parse("#{config.server_prefix}/#{url}")
-      request_method = Net::HTTP.const_get method.to_s.capitalize
-      request        = request_method.new uri.request_uri
-      request.add_field 'Authorization', config.api_key
+    def request(method, path, options = {})
+      options[:method]  = method.to_s.upcase
+      options[:path]    = path
+      options[:headers] ||= {}
+      options[:headers]['Authorization'] = config.api_key
 
-      yield request if block_given?
+      log "#{options[:method]} #{config.server_prefix}/#{options[:path]}"
+      http.request(options)
+    end
 
-      log "#{method.to_s.upcase} #{uri.to_s}"
-      http.request request
+    def push(method, path, body)
+      json = body.to_json
+      request(method, path,
+                   :body    => json,
+                   :headers => {"Content-Length" => json.size.to_s,
+                                "Content-Type"   => "application/json"})
     end
 
     def fetch_commands
-      raw_commands = http_request(:get, "api/v1/commands.json")
+      raw_commands = request(:get, "/api/v1/commands.json")
       commands = JSON.parse(raw_commands.body)
 
       commands.each do |id, command|
@@ -64,22 +59,14 @@ module Daikon
         pretty = StringIO.new
         PP.pp(result, pretty)
 
-        http_request(:put, "api/v1/commands/#{id}.json") do |request|
-          request.body = {"response" => pretty.string.strip}.to_json
-          request.add_field "Content-Length", request.body.size.to_s
-          request.add_field "Content-Type",   "application/json"
-        end
+        push :put, "/api/v1/commands/#{id}.json", {"response" => pretty.string.strip}
       end
     rescue *EXCEPTIONS => ex
       log ex.to_s
     end
 
     def report_info
-      http_request(:post, "api/v1/info.json") do |request|
-        request.body = redis.info.to_json
-        request.add_field "Content-Length", request.body.size.to_s
-        request.add_field "Content-Type",   "application/json"
-      end
+      push :post, "/api/v1/info.json", redis.info
     rescue *EXCEPTIONS => ex
       log ex.to_s
     end
@@ -87,11 +74,7 @@ module Daikon
     def rotate_monitor
       lines = monitor.rotate
 
-      http_request(:post, "api/v1/monitor.json") do |request|
-        request.body = {"lines" => lines}.to_json
-        request.add_field "Content-Length", request.body.size.to_s
-        request.add_field "Content-Type",   "application/json"
-      end
+      push :post, "/api/v1/monitor.json", {"lines" => lines}
     rescue *EXCEPTIONS => ex
       log ex.to_s
     end

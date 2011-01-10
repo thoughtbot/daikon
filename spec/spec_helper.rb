@@ -10,9 +10,6 @@ Dir["#{File.dirname(__FILE__)}/support/**/*.rb"].each {|f| require f}
 require 'timecop'
 require 'bourne'
 
-require 'webmock/rspec'
-WebMock.disable_net_connect!
-
 RSpec.configure do |config|
   config.mock_with :mocha
 end

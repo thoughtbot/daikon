@@ -6,9 +6,9 @@ require 'shellwords'
 require 'socket'
 require 'stringio'
 
+require 'excon'
 require 'daemons'
 require 'json'
-require 'net/https'
 require 'redis'
 
 __DIR__ = File.dirname(__FILE__)
