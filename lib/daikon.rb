@@ -5,6 +5,7 @@ require 'pp'
 require 'shellwords'
 require 'socket'
 require 'stringio'
+require 'thread'
 
 require 'excon'
 require 'daemons'

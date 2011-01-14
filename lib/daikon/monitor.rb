@@ -10,6 +10,7 @@ module Daikon
       @queue  = []
       @redis  = redis
       @logger = logger
+      @mutex  = Mutex.new
     end
 
     def start
@@ -20,8 +21,12 @@ module Daikon
       end
     end
 
+    def lock(&block)
+      @mutex.synchronize(&block)
+    end
+
     def rotate
-      @queue.shift(@queue.size)
+      lock { @queue.shift(@queue.size) }
     end
 
     def parse(line)
@@ -33,7 +38,7 @@ module Daikon
     end
 
     def push(at, command)
-      @queue.push({:at => at, :command => command.strip})
+      lock { @queue.push({:at => at, :command => command.strip}) }
     end
   end
 end
