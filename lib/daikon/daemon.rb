@@ -1,6 +1,23 @@
 module Daikon
   class Daemon
-    def self.start(argv)
+    def self.sleep_time=(sleep_time)
+      @@sleep_time = sleep_time
+    end
+
+    def self.sleep_time
+      @@sleep_time ||= 1
+    end
+
+    def self.run=(run)
+      @@run = run
+    end
+
+    def self.run
+      @@run
+    end
+
+    def self.start(argv, ontop = false)
+      self.run = true
       config = Daikon::Configuration.new(argv)
 
       if argv.include?("-v") || argv.include?("--version")
@@ -8,31 +25,24 @@ module Daikon
         return
       end
 
-      Daemons.run_proc("daikon", :log_output => true, :backtrace => true) do
+      Daemons.run_proc("daikon", :ARGV => argv, :log_output => true, :backtrace => true, :ontop => ontop) do
         if argv.include?("run")
           logger = Logger.new(STDOUT)
         else
           logger = Logger.new("/tmp/radish.log")
         end
 
-        count  = 0
+        collected_at = Time.now
         client = Daikon::Client.new
         client.setup(config, logger)
         client.start_monitor
 
-        loop do
-          if count % 5 == 0
-            client.report_info
-          end
-
-          client.fetch_commands
-
-          if count % 10 == 9
+        while self.run do
+          if Time.now - collected_at >= sleep_time * 60
+            collected_at = Time.now
             client.rotate_monitor
           end
-
-          count += 1
-          sleep 1
+          sleep sleep_time
         end
       end
     end
