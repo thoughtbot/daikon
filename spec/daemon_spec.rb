@@ -13,7 +13,7 @@ describe Daikon::Daemon do
     thread = Thread.new do
       Daikon::Daemon.start(["run", "--", "-k", "1234"], true)
     end
-    sleep 1
+    sleep 0.65
     Daikon::Daemon.run = false
     client.should have_received(:rotate_monitor)
   end
