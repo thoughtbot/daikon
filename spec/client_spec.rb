@@ -134,55 +134,8 @@ describe Daikon::Client, "when it returns bad json" do
   end
 end
 
-shared_examples_for "a info api consumer" do
+shared_examples_for "a summary api consumer" do
   it "shoots the results back to radish" do
-    headers = {
-      "Authorization"  => api_key,
-      "Content-Length" => results.to_json.size.to_s,
-      "Content-Type"   => "application/json"
-    }
-
-    http.should have_received(:request).with(
-      :method  => "POST",
-      :path    => "/api/v1/info.json",
-      :body    => results.to_json,
-      :headers => headers)
-  end
-end
-
-describe Daikon::Client, "report info" do
-  subject       { Daikon::Client.new }
-  let(:results) { {"connected_clients"=>"1", "used_cpu_sys_childrens"=>"0.00"} }
-  let(:redis)   { stub("redis instance", :info => results) }
-  let(:http)    { stub("http", :request => Excon::Response.new) }
-
-  before do
-    subject.stubs(:redis => redis, :http => http)
-    subject.setup(config)
-    subject.report_info
-  end
-
-  context "with default configuration" do
-    let(:api_key) { config.api_key }
-    let(:server)  { "https://radish.heroku.com" }
-    let(:config)  { Daikon::Configuration.new }
-
-    it_should_behave_like "a info api consumer"
-  end
-
-  context "with custom settings" do
-    let(:api_key) { "0987654321" }
-    let(:server)  { "http://localhost:9999" }
-    let(:config)  { Daikon::Configuration.new(["-k", api_key, "-s", "http://localhost:9999"]) }
-
-    it_should_behave_like "a info api consumer"
-  end
-end
-
-shared_examples_for "a monitor api consumer" do
-  it "shoots the results back to radish" do
-    payload = {"lines" => lines}
-
     headers = {
       "Authorization"  => api_key,
       "Content-Length" => payload.to_json.size.to_s,
@@ -191,26 +144,30 @@ shared_examples_for "a monitor api consumer" do
 
     http.should have_received(:request).with(
       :method  => "POST",
-      :path    => "/api/v1/monitor.json",
+      :path    => "/api/v1/summaries.json",
       :body    => payload.to_json,
       :headers => headers)
   end
 end
 
 describe Daikon::Client, "rotate monitor" do
-  subject       { Daikon::Client.new }
-  let(:results) { %{1290289048.96581 "info"\n1290289053.568815 "info"} }
-  let(:redis)   { stub("redis instance", :info => results) }
-  let(:http)    { stub("http", :request => Excon::Response.new) }
-  let(:lines) do
-    [{"at" => 1290289048.96581,  "command" => "info"},
-     {"at" => 1290289053.568815, "command" => "info"}]
+  subject     { Daikon::Client.new }
+  let(:info)  { {"used_memory_human" => "100MB"} }
+  let(:redis) { stub("redis instance", :info => info) }
+  let(:http)  { stub("http", :request => Excon::Response.new) }
+  let(:payload) do
+    {"data" => data, "info" => info}
+  end
+  let(:data) do
+    {"commands" => {"GET" => 42},
+     "totals"   => {"all" => "42", "read" => 42},
+     "keys"     => {"foo" => 42}}
   end
 
   before do
-    subject.stubs(:http => http)
+    subject.stubs(:http => http, :redis => redis)
     subject.setup(config)
-    subject.monitor = stub("monitor", :rotate => lines)
+    subject.monitor = stub("monitor", :rotate => data)
     subject.rotate_monitor
   end
 
@@ -219,7 +176,7 @@ describe Daikon::Client, "rotate monitor" do
     let(:server)  { "https://radish.heroku.com" }
     let(:config)  { Daikon::Configuration.new }
 
-    it_should_behave_like "a monitor api consumer"
+    it_should_behave_like "a summary api consumer"
   end
 
   context "with custom settings" do
@@ -227,7 +184,7 @@ describe Daikon::Client, "rotate monitor" do
     let(:server)  { "http://localhost:9999" }
     let(:config)  { Daikon::Configuration.new(["-k", api_key, "-s", "http://localhost:9999"]) }
 
-    it_should_behave_like "a monitor api consumer"
+    it_should_behave_like "a summary api consumer"
   end
 end
 

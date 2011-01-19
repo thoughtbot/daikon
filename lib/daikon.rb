@@ -1,8 +1,8 @@
 require 'rubygems'
 
 require 'logger'
-require 'pp'
 require 'shellwords'
+require 'set'
 require 'socket'
 require 'stringio'
 require 'thread'

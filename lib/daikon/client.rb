@@ -65,16 +65,13 @@ module Daikon
       log ex.to_s
     end
 
-    def report_info
-      push :post, "/api/v1/info.json", redis.info
-    rescue *EXCEPTIONS => ex
-      log ex.to_s
-    end
-
     def rotate_monitor
-      lines = monitor.rotate
+      payload = {
+        "data" => monitor.rotate,
+        "info" => redis.info
+      }
 
-      push :post, "/api/v1/monitor.json", {"lines" => lines}
+      push :post, "/api/v1/summaries.json", payload
     rescue *EXCEPTIONS => ex
       log ex.to_s
     end

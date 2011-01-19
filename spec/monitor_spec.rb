@@ -1,15 +1,36 @@
 require 'spec_helper'
 
 describe Daikon::Monitor, "#rotate" do
-  it "pops off what is on the queue" do
+  before do
     subject.parse("INCR foo")
     subject.parse("DECR foo")
+    subject.parse("DECR baz")
+    subject.parse("HGETALL faz")
+    subject.parse("PING")
+  end
 
-    data = subject.rotate
-    data.first[:command].should == "INCR foo"
-    data.last[:command].should  == "DECR foo"
-    data.size.should == 2
-    subject.queue.size.should be_zero
+  it "clears out current data" do
+    subject.rotate
+    subject.data["commands"].size.should be_zero
+    subject.data["totals"].size.should be_zero
+    subject.data["keys"].size.should be_zero
+  end
+
+  it "increments each command type" do
+    subject.data["commands"]["INCR"].should == 1
+    subject.data["commands"]["DECR"].should == 2
+  end
+
+  it "keeps track of key accesses" do
+    subject.data["keys"]["foo"].should == 2
+    subject.data["keys"]["baz"].should == 1
+  end
+
+  it "tallies up totals of commands" do
+    subject.data["totals"]["all"].should == 5
+    subject.data["totals"]["read"].should == 1
+    subject.data["totals"]["write"].should == 3
+    subject.data["totals"]["other"].should == 1
   end
 end
 
@@ -19,7 +40,10 @@ describe Daikon::Monitor, "#parse with new format" do
 
   it "parses the log into json" do
     subject.parse(line)
-    subject.queue.should include({:at => 1291699658.994073, :command => '"decrby" "fooz" "2000"'})
+    subject.data["commands"]["DECRBY"].should == 1
+    subject.data["keys"]["fooz"].should == 1
+    subject.data["totals"]["all"].should == 1
+    subject.data["totals"]["write"].should == 1
   end
 end
 
@@ -29,78 +53,65 @@ describe Daikon::Monitor, "#parse with new format that has reply byte" do
 
   it "parses the log into json" do
     subject.parse(line)
-    subject.queue.should include({:at => 1291699658.994073, :command => '"decrby" "fooz" "2000"'})
-  end
-end
-
-describe Daikon::Monitor, "#parse with multiple inputs" do
-  subject { Daikon::Monitor.new }
-  before  { Timecop.freeze }
-  after   { Timecop.return }
-
-  it "queues up multiple lines" do
-    subject.parse("+OK")
-    subject.parse("INCR foo")
-    subject.parse("INCR fooz")
-    subject.parse("info")
-
-    subject.queue.size.should == 3
-    subject.queue.should include({:at => Time.now.to_f, :command => 'INCR foo'})
-    subject.queue.should include({:at => Time.now.to_f, :command => 'INCR fooz'})
-    subject.queue.should include({:at => Time.now.to_f, :command => 'info'})
+    subject.data["commands"]["DECRBY"].should == 1
+    subject.data["keys"]["fooz"].should == 1
+    subject.data["totals"]["all"].should == 1
+    subject.data["totals"]["write"].should == 1
   end
 end
 
 describe Daikon::Monitor, "#parse with old multi line input" do
   subject { Daikon::Monitor.new }
-  before  { Timecop.freeze }
-  after   { Timecop.return }
 
-  it "parses gzipped logs into raws" do
+  it "parses logs" do
     subject.parse("incr foo")
     subject.parse("sismember project-13897-global-error-classes 17")
     subject.parse("incrApiParameterError")
     subject.parse("decr foo")
 
-    subject.queue.size.should == 3
-    subject.queue.should include({:at => Time.now.to_f, :command => 'incr foo'})
-    subject.queue.should include({:at => Time.now.to_f, :command => 'sismember project-13897-global-error-classes 17'})
-    subject.queue.should include({:at => Time.now.to_f, :command => 'decr foo'})
+    subject.data["commands"]["DECR"].should == 1
+    subject.data["commands"]["INCR"].should == 1
+    subject.data["commands"]["SISMEMBER"].should == 1
+    subject.data["keys"]["foo"].should == 2
+    subject.data["keys"]["project-13897-global-error-classes"].should == 1
+    subject.data["totals"]["all"].should == 3
+    subject.data["totals"]["write"].should == 2
+    subject.data["totals"]["read"].should == 1
   end
 end
 
-describe Daikon::Monitor, "#parse with multi line input with numbers" do
+describe Daikon::Monitor, "#parse with old input" do
   subject { Daikon::Monitor.new }
-  before  { Timecop.freeze }
-  after   { Timecop.return }
 
-  it "parses gzipped logs into raws" do
-    subject.parse("incr foo")
-    subject.parse("set g:2470920:mrn 9")
-    subject.parse("554079885")
-    subject.parse("decr foo")
-
-    subject.queue.size.should == 3
-    subject.queue.should include({:at => Time.now.to_f, :command => 'incr foo'})
-    subject.queue.should include({:at => Time.now.to_f, :command => 'set g:2470920:mrn 9'})
-    subject.queue.should include({:at => Time.now.to_f, :command => 'decr foo'})
+  shared_examples_for "a valid parser" do
+    it "parses the given commands properly" do
+      subject.data["commands"]["DECR"].should == 1
+      subject.data["commands"]["INCR"].should == 1
+      subject.data["commands"]["SET"].should == 1
+      subject.data["keys"]["foo"].should == 2
+      subject.data["keys"]["g:2470920:mrn"].should == 1
+      subject.data["totals"]["all"].should == 3
+      subject.data["totals"]["write"].should == 3
+    end
   end
-end
 
-describe Daikon::Monitor, "#parse with strings that may to_i to a number" do
-  subject { Daikon::Monitor.new }
-  before  { Timecop.freeze }
-  after   { Timecop.return }
+  context "with a bulk input that is a number" do
+    before do
+      subject.parse("incr foo")
+      subject.parse("set g:2470920:mrn 9")
+      subject.parse("554079885")
+      subject.parse("decr foo")
+    end
+    it_should_behave_like "a valid parser"
+  end
 
-  it "parses gzipped logs into raws" do
-    subject.parse("incr foo")
-    subject.parse("set g:2470920:mrn 9")
-    subject.parse("46fdcf77c1bb2108e6191602c2f5f9ae")
-    subject.parse("decr foo")
-
-    subject.queue.size.should == 3
-    subject.queue.should include({:at => Time.now.to_f, :command => 'incr foo'})
-    subject.queue.should include({:at => Time.now.to_f, :command => 'set g:2470920:mrn 9'})
-    subject.queue.should include({:at => Time.now.to_f, :command => 'decr foo'})
+  context "with a bulk input that is a number" do
+    before do
+      subject.parse("incr foo")
+      subject.parse("set g:2470920:mrn 9")
+      subject.parse("46fdcf77c1bb2108e6191602c2f5f9ae")
+      subject.parse("decr foo")
+    end
+    it_should_behave_like "a valid parser"
   end
 end
