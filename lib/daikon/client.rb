@@ -65,10 +65,12 @@ module Daikon
       log ex.to_s
     end
 
-    def rotate_monitor
+    def rotate_monitor(start, stop)
       payload = {
-        "data" => monitor.rotate,
-        "info" => redis.info
+        "data"  => monitor.rotate,
+        "info"  => redis.info,
+        "start" => start,
+        "stop"  => stop
       }
 
       push :post, "/api/v1/summaries.json", payload

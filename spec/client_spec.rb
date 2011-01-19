@@ -155,8 +155,13 @@ describe Daikon::Client, "rotate monitor" do
   let(:info)  { {"used_memory_human" => "100MB"} }
   let(:redis) { stub("redis instance", :info => info) }
   let(:http)  { stub("http", :request => Excon::Response.new) }
+  let(:now)   { "2011-01-19T18:23:55-05:00" }
+  let(:past)  { "2011-01-19T18:23:54-05:00" }
   let(:payload) do
-    {"data" => data, "info" => info}
+    {"data"  => data,
+     "info"  => info,
+     "start" => past,
+     "stop"  => now}
   end
   let(:data) do
     {"commands" => {"GET" => 42},
@@ -165,10 +170,15 @@ describe Daikon::Client, "rotate monitor" do
   end
 
   before do
+    Timecop.freeze DateTime.parse(now)
     subject.stubs(:http => http, :redis => redis)
     subject.setup(config)
     subject.monitor = stub("monitor", :rotate => data)
-    subject.rotate_monitor
+    subject.rotate_monitor(DateTime.parse(past), DateTime.parse(now))
+  end
+
+  after do
+    Timecop.return
   end
 
   context "with default configuration" do

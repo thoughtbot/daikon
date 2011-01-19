@@ -38,9 +38,10 @@ module Daikon
         client.start_monitor
 
         while self.run do
-          if Time.now - collected_at >= sleep_time * 60
-            collected_at = Time.now
-            client.rotate_monitor
+          now = Time.now
+          if now - collected_at >= sleep_time * 60
+            client.rotate_monitor(collected_at, now)
+            collected_at = now
           end
           sleep sleep_time
         end
