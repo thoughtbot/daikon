@@ -42,6 +42,7 @@ module Daikon
         this_data = self.data.dup
         self.data.replace(data_hash)
       end
+      this_data["keys"] = Hash[*this_data["keys"].sort_by(&:last).reverse[0..99].flatten]
       this_data
     end
 

@@ -16,6 +16,15 @@ describe Daikon::Monitor, "#rotate" do
     subject.data["keys"].size.should be_zero
   end
 
+  it "only saves the top 100 key listings" do
+    150.times { |n| subject.parse("INCR foo#{n}") }
+    150.times { |n| subject.parse("DECR foo#{n}") }
+    100.times { |n| subject.parse("DEL foo#{n}") }
+    data = subject.rotate
+    data["keys"].size.should == 100
+    data["keys"].values.all? { |n| n == 3 }.should be_true
+  end
+
   it "increments each command type" do
     subject.data["commands"]["INCR"].should == 1
     subject.data["commands"]["DECR"].should == 2

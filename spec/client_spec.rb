@@ -160,7 +160,7 @@ describe Daikon::Client, "rotate monitor" do
   end
   let(:data) do
     {"commands" => {"GET" => 42},
-     "totals"   => {"all" => "42", "read" => 42},
+     "totals"   => {"all" => 42, "read" => 42},
      "keys"     => {"foo" => 42}}
   end
 
