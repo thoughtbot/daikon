@@ -6,7 +6,8 @@ module Daikon
                   Errno::EINVAL,
                   Errno::ECONNRESET,
                   EOFError,
-                  JSON::ParserError]
+                  JSON::ParserError,
+                  Excon::Errors::SocketError]
 
     attr_accessor :redis, :logger, :config, :http, :monitor
 
