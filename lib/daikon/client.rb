@@ -67,12 +67,11 @@ module Daikon
     end
 
     def rotate_monitor(start, stop)
-      payload = {
-        "data"  => monitor.rotate,
+      payload = monitor.rotate.merge({
         "info"  => redis.info,
         "start" => start,
         "stop"  => stop
-      }
+      })
 
       push :post, "/api/v1/summaries.json", payload
     rescue *EXCEPTIONS => ex

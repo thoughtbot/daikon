@@ -158,10 +158,9 @@ describe Daikon::Client, "rotate monitor" do
   let(:now)   { "2011-01-19T18:23:55-05:00" }
   let(:past)  { "2011-01-19T18:23:54-05:00" }
   let(:payload) do
-    {"data"  => data,
-     "info"  => info,
+    data.merge({"info"  => info,
      "start" => past,
-     "stop"  => now}
+     "stop"  => now})
   end
   let(:data) do
     {"commands" => {"GET" => 42},
