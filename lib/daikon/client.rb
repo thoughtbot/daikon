@@ -68,7 +68,6 @@ module Daikon
 
     def rotate_monitor(start, stop)
       payload = monitor.rotate.merge({
-        "info"  => redis.info,
         "start" => start,
         "stop"  => stop
       })
