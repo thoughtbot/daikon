@@ -5,7 +5,7 @@ describe Daikon::Daemon do
 
   before do
     Daikon::Client.stubs(:new => client)
-    Daikon::Daemon.sleep_time = 0.01
+    Daikon::Daemon.sleep_time = 0.05
     client.stubs(:setup => true,
                  :start_monitor => true,
                  :rotate_monitor => true,
@@ -16,18 +16,10 @@ describe Daikon::Daemon do
     thread = Thread.new do
       Daikon::Daemon.start(["run", "--", "-k", "1234"], true)
     end
-    sleep 0.65
+    sleep 3.1
     Daikon::Daemon.run = false
     client.should have_received(:rotate_monitor)
-  end
-
-  it "submits info to radish every 5 runs" do
-    thread = Thread.new do
-      Daikon::Daemon.start(["run", "--", "-k", "1234"], true)
-    end
-    sleep 0.2
-    Daikon::Daemon.run = false
-    client.should have_received(:report_info).times(3)
+    client.should have_received(:report_info).times(12)
   end
 end
 
