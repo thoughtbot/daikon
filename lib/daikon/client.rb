@@ -77,6 +77,12 @@ module Daikon
       log ex.to_s
     end
 
+    def report_info
+       push :post, "/api/v1/info.json", redis.info
+    rescue *EXCEPTIONS => ex
+      log ex.to_s
+    end
+
     def evaluate_redis(command)
       # Attempt to parse the given command string.
       argv =

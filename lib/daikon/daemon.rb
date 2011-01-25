@@ -32,17 +32,26 @@ module Daikon
           logger = Logger.new("/tmp/radish.log")
         end
 
-        collected_at = Time.now
-        client = Daikon::Client.new
+        rotated_at  = Time.now
+        reported_at = Time.now
+        client      = Daikon::Client.new
+
         client.setup(config, logger)
         client.start_monitor
 
         while self.run do
           now = Time.now
-          if now - collected_at >= sleep_time * 60
-            client.rotate_monitor(collected_at, now)
-            collected_at = now
+
+          if now - reported_at >= sleep_time * 5
+            client.report_info
+            reported_at = now
           end
+
+          if now - rotated_at >= sleep_time * 60
+            client.rotate_monitor(rotated_at, now)
+            rotated_at = now
+          end
+
           sleep sleep_time
         end
       end

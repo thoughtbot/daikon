@@ -213,3 +213,48 @@ describe Daikon::Client, "pretty printing results" do
     ))
   end
 end
+
+shared_examples_for "a info api consumer" do
+  it "shoots the results back to radish" do
+    headers = {
+      "Authorization"  => api_key,
+      "Content-Length" => results.to_json.size.to_s,
+      "Content-Type"   => "application/json"
+    }
+
+    http.should have_received(:request).with(
+      :method  => "POST",
+      :path    => "/api/v1/info.json",
+      :body    => results.to_json,
+      :headers => headers)
+  end
+end
+
+describe Daikon::Client, "report info" do
+  subject       { Daikon::Client.new }
+  let(:results) { {"connected_clients"=>"1", "used_cpu_sys_childrens"=>"0.00"} }
+  let(:redis)   { stub("redis instance", :info => results) }
+  let(:http)    { stub("http", :request => Excon::Response.new) }
+
+  before do
+    subject.stubs(:redis => redis, :http => http)
+    subject.setup(config)
+    subject.report_info
+  end
+
+  context "with default configuration" do
+    let(:api_key) { config.api_key }
+    let(:server)  { "https://radish.heroku.com" }
+    let(:config)  { Daikon::Configuration.new }
+
+    it_should_behave_like "a info api consumer"
+  end
+
+  context "with custom settings" do
+    let(:api_key) { "0987654321" }
+    let(:server)  { "http://localhost:9999" }
+    let(:config)  { Daikon::Configuration.new(["-k", api_key, "-s", "http://localhost:9999"]) }
+
+    it_should_behave_like "a info api consumer"
+  end
+end
