@@ -45,12 +45,12 @@ module Daikon
         while self.run do
           now = Time.now
 
-          if now - reported_at >= sleep_time * INFO_INTERVAL
+          if now - reported_at >= sleep_time * INFO_INTERVAL.to_i
             client.report_info
             reported_at = now
           end
 
-          if now - rotated_at >= sleep_time * SUMMARY_INTERVAL
+          if now - rotated_at >= sleep_time * SUMMARY_INTERVAL.to_i
             client.rotate_monitor(rotated_at, now)
             rotated_at = now
           end
