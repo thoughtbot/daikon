@@ -1,5 +1,8 @@
 module Daikon
   class Daemon
+    INFO_INTERVAL    = ENV["INFO_INTERVAL"] || 5
+    SUMMARY_INTERVAL = ENV["SUMMARY_INTERVAL"] || 60
+
     def self.sleep_time=(sleep_time)
       @@sleep_time = sleep_time
     end
@@ -42,12 +45,12 @@ module Daikon
         while self.run do
           now = Time.now
 
-          if now - reported_at >= sleep_time * 5
+          if now - reported_at >= sleep_time * INFO_INTERVAL
             client.report_info
             reported_at = now
           end
 
-          if now - rotated_at >= sleep_time * 60
+          if now - rotated_at >= sleep_time * SUMMARY_INTERVAL
             client.rotate_monitor(rotated_at, now)
             rotated_at = now
           end
