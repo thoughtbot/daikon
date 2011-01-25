@@ -69,7 +69,7 @@ module Daikon
     end
 
     def incr_key(key)
-      data["keys"][key] += 1
+      data["keys"][key.gsub(".", "{PERIOD}").gsub("$", "{DOLLAR}")] += 1
     end
 
     def incr_total(command)

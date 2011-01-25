@@ -25,6 +25,13 @@ describe Daikon::Monitor, "#rotate" do
     data["keys"].values.all? { |n| n == 3 }.should be_true
   end
 
+  it "santizes key names" do
+    subject.parse("INCR $foo.zomg")
+    data = subject.rotate
+    data["keys"]["$foo.zomg"].should be_nil
+    data["keys"]["{DOLLAR}foo{PERIOD}zomg"].should == 1
+  end
+
   it "increments each command type" do
     subject.data["commands"]["INCR"].should == 1
     subject.data["commands"]["DECR"].should == 2
