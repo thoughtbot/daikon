@@ -25,9 +25,9 @@ describe Daikon::Daemon do
     thread = Thread.new do
       Daikon::Daemon.start(["run", "--", "-k", "1234"], true)
     end
-    sleep 0.15
+    sleep 0.2
     Daikon::Daemon.run = false
-    client.should have_received(:report_info).twice
+    client.should have_received(:report_info).times(3)
   end
 end
 
