@@ -224,7 +224,7 @@ shared_examples_for "a info api consumer" do
 
     http.should have_received(:request).with(
       :method  => "POST",
-      :path    => "/api/v1/info.json",
+      :path    => "/api/v1/infos.json",
       :body    => results.to_json,
       :headers => headers)
   end
