@@ -159,9 +159,10 @@ describe Daikon::Client, "rotate monitor" do
     data.merge("start" => past, "stop" => now)
   end
   let(:data) do
-    {"commands" => {"GET" => 42},
-     "totals"   => {"all" => 42, "read" => 42},
-     "keys"     => {"foo" => 42}}
+    {"commands"   => {"GET" => 42},
+     "keys"       => {"foo" => 42},
+     "namespaces" => {"a" => 42, "global" => 42},
+     "totals"     => {"all" => 42, "read" => 42}}
   end
 
   before do

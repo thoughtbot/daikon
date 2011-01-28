@@ -142,3 +142,21 @@ describe Daikon::Monitor, "#rotate with a bad command name" do
     data["commands"].size.should be_zero
   end
 end
+
+describe Daikon::Monitor, "#rotate that collects namespaces" do
+  before do
+    subject.parse("set g:2470920:mrn 9")
+    subject.parse("get g:2470914:mrn")
+    subject.parse("incr s3-queue-key")
+    subject.parse("info")
+    subject.parse("decr somehorriblynamespacedkey")
+    subject.parse("flushdb")
+  end
+
+  it "keeps track of namespace accesses" do
+    data = subject.rotate
+    data["namespaces"]["g"].should == 2
+    data["namespaces"]["global"].should == 3
+    data["namespaces"]["s3"].should == 1
+  end
+end

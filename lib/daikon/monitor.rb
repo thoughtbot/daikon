@@ -20,9 +20,10 @@ module Daikon
     end
 
     def data_hash
-      {"commands" => Hash.new(0),
-       "totals"   => Hash.new(0),
-       "keys"     => Hash.new(0)}
+      {"commands"   => Hash.new(0),
+       "keys"       => Hash.new(0),
+       "namespaces" => Hash.new(0),
+       "totals"     => Hash.new(0)}
     end
 
     def start
@@ -61,8 +62,26 @@ module Daikon
       lock do
         incr_command(command)
         incr_total(command)
-        incr_key(key) if key
+        if key
+          incr_key(key)
+          incr_namespace(key)
+        else
+          incr_global_namespace
+        end
       end
+    end
+
+    def incr_namespace(key)
+      namespace, has_namespace = key.split(/(?::|-)/, 2)
+      if has_namespace
+        data["namespaces"][namespace] += 1
+      else
+        incr_global_namespace
+      end
+    end
+
+    def incr_global_namespace
+      data["namespaces"]["global"] += 1
     end
 
     def incr_command(command)
