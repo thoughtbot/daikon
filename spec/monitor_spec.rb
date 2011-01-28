@@ -131,3 +131,14 @@ describe Daikon::Monitor, "#parse with old input" do
     it_should_behave_like "a valid parser"
   end
 end
+
+describe Daikon::Monitor, "#rotate with a bad command name" do
+  before do
+    subject.parse("gmail foo")
+  end
+
+  it "clears out current data" do
+    data = subject.rotate
+    data["commands"].size.should be_zero
+  end
+end
