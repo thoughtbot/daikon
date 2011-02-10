@@ -1,14 +1,14 @@
 module Daikon
   class Daemon
     INFO_INTERVAL    = ENV["INFO_INTERVAL"] || 5
-    SUMMARY_INTERVAL = ENV["SUMMARY_INTERVAL"] || 60
+    SUMMARY_INTERVAL = ENV["SUMMARY_INTERVAL"] || 1
 
     def self.sleep_time=(sleep_time)
       @@sleep_time = sleep_time
     end
 
     def self.sleep_time
-      @@sleep_time ||= 1
+      @@sleep_time ||= 0.5
     end
 
     def self.run=(run)
