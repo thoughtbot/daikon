@@ -33,6 +33,13 @@ module Daikon
       logger.info message if logger
     end
 
+    def exception(error)
+      log error.to_s
+      error.backtrace.each do |line|
+        log line
+      end
+    end
+
     def request(method, path, options = {})
       options[:method]  = method.to_s.upcase
       options[:path]    = path
@@ -63,7 +70,7 @@ module Daikon
         push :put, "/api/v1/commands/#{id}.json", {"response" => pretty.string.strip}
       end
     rescue *EXCEPTIONS => ex
-      log ex.to_s
+      exception(ex)
     end
 
     def rotate_monitor(start, stop)
@@ -74,13 +81,13 @@ module Daikon
 
       push :post, "/api/v1/summaries.json", payload
     rescue *EXCEPTIONS => ex
-      log ex.to_s
+      exception(ex)
     end
 
     def report_info
        push :post, "/api/v1/infos.json", redis.info
     rescue *EXCEPTIONS => ex
-      log ex.to_s
+      exception(ex)
     end
 
     def evaluate_redis(command)
@@ -89,8 +96,7 @@ module Daikon
         begin
           Shellwords.shellwords(command.to_s)
         rescue Exception => e
-          STDERR.puts e.message
-          e.backtrace.each {|bt| STDERR.puts bt}
+          exception(e)
           return e.message
         end
       return "No command received." unless argv[0]
@@ -98,8 +104,7 @@ module Daikon
       begin
         execute_redis(argv)
       rescue Exception => e
-        STDERR.puts e.message
-        e.backtrace.each {|bt| STDERR.puts bt}
+        exception(e)
         e.message
       end
     end
