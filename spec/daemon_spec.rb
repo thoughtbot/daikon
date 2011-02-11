@@ -18,7 +18,7 @@ describe Daikon::Daemon do
     end
     sleep 3.1
     Daikon::Daemon.run = false
-    client.should have_received(:rotate_monitor).times(61)
+    client.should have_received(:rotate_monitor)
     client.should have_received(:report_info).times(12)
   end
 end
