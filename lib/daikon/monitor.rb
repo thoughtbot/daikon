@@ -59,6 +59,9 @@ module Daikon
     def push(raw_command)
       command, key, *rest = raw_command.strip.gsub('"', '').split
       command.upcase!
+
+      return unless ALL_COMMANDS.member?(command)
+
       lock do
         incr_command(command)
         incr_total(command)
@@ -85,7 +88,7 @@ module Daikon
     end
 
     def incr_command(command)
-      data["commands"][command] += 1 if ALL_COMMANDS.member?(command)
+      data["commands"][command] += 1
     end
 
     def incr_key(key)

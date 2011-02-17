@@ -160,3 +160,17 @@ describe Daikon::Monitor, "#rotate that collects namespaces" do
     data["namespaces"]["s3"].should == 1
   end
 end
+
+describe Daikon::Monitor, "#rotate with values that have spaces" do
+  before do
+    subject.parse("set g:2470920:mrn 11")
+    subject.parse("Email Error")
+  end
+
+  it "keeps track of namespace accesses" do
+    data = subject.rotate
+    data["commands"].should   == {"SET" => 1}
+    data["keys"].should       == {"g:2470920:mrn" => 1}
+    data["namespaces"].should == {"g" => 1}
+  end
+end
