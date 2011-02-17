@@ -37,72 +37,6 @@ describe Daikon::Client, "setup" do
   end
 end
 
-shared_examples_for "a command api consumer" do
-  it "sends a request for commands" do
-    http.should have_received(:request).with(
-      :method  => "GET",
-      :path    => "/api/v1/commands.json",
-      :headers => {"Authorization" => api_key})
-  end
-
-  it "processes each command" do
-    subject.should have_received(:evaluate_redis).with("INCR foo")
-    subject.should have_received(:evaluate_redis).with("DECR foo")
-  end
-
-  it "shoots the results back to radish" do
-    results = {"response" => "9999"}.to_json
-
-    headers = {
-      "Authorization"  => api_key,
-      "Content-Length" => results.size.to_s,
-      "Content-Type"   => "application/json"
-    }
-
-    http.should have_received(:request).with(
-      :method  => "PUT",
-      :path    => "/api/v1/commands/42.json",
-      :body    => results,
-      :headers => headers)
-
-    http.should have_received(:request).with(
-      :method  => "PUT",
-      :path    => "/api/v1/commands/43.json",
-      :body    => results,
-      :headers => headers)
-  end
-end
-
-describe Daikon::Client, "fetching commands" do
-  subject       { Daikon::Client.new }
-  let(:body)    { {"42" => "INCR foo", "43" => "DECR foo"}.to_json }
-  let(:http)    { stub("http", :request => Excon::Response.new(:body => body)) }
-
-  before do
-    subject.stubs(:evaluate_redis => 9999)
-    subject.stubs(:http => http)
-
-    subject.setup(config)
-    subject.fetch_commands
-  end
-
-  context "with default configuration" do
-    let(:api_key) { config.api_key }
-    let(:server)  { "https://radish.heroku.com" }
-    let(:config)  { Daikon::Configuration.new([]) }
-
-    it_should_behave_like "a command api consumer"
-  end
-
-  context "with custom settings" do
-    let(:api_key) { "0987654321" }
-    let(:server)  { "http://localhost:9999" }
-    let(:config)  { Daikon::Configuration.new(["-k", api_key, "-s", "http://localhost:9999"]) }
-
-    it_should_behave_like "a command api consumer"
-  end
-end
-
 describe Daikon::Client, "when server is down" do
   subject       { Daikon::Client.new }
   before do
@@ -114,7 +48,7 @@ describe Daikon::Client, "when server is down" do
 
   it "does not commit suicide" do
     lambda {
-      subject.fetch_commands
+      subject.report_info
     }.should_not raise_error
   end
 end
@@ -129,7 +63,7 @@ describe Daikon::Client, "when it returns bad json" do
 
   it "does not commit suicide" do
     lambda {
-      subject.fetch_commands
+      subject.report_info
     }.should_not raise_error
   end
 end
@@ -191,27 +125,6 @@ describe Daikon::Client, "rotate monitor" do
     let(:config)  { Daikon::Configuration.new(["-k", api_key, "-s", "http://localhost:9999"]) }
 
     it_should_behave_like "a summary api consumer"
-  end
-end
-
-describe Daikon::Client, "pretty printing results" do
-  subject      { Daikon::Client.new }
-  let(:body)   { {"13" => "LRANGE foo 0 -1"}.to_json }
-  let(:list)   { %w[apples bananas carrots] }
-  let(:server) { "https://radish.heroku.com" }
-  let(:config) { Daikon::Configuration.new }
-  let(:http)   { stub("http", :request => Excon::Response.new(:body => body)) }
-
-  before do
-    subject.stubs(:evaluate_redis => list, :http => http)
-    subject.setup(config)
-    subject.fetch_commands
-  end
-
-  it "returns pretty printed results" do
-    http.should have_received(:request).with(has_entry(
-      :body => {"response" => "[\"apples\", \"bananas\", \"carrots\"]"}.to_json
-    ))
   end
 end
 

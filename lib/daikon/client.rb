@@ -1,7 +1,5 @@
 module Daikon
   class Client
-    include NamespaceTools
-
     EXCEPTIONS = [Timeout::Error,
                   Errno::EINVAL,
                   Errno::ECONNRESET,
@@ -58,21 +56,6 @@ module Daikon
                                 "Content-Type"   => "application/json"})
     end
 
-    def fetch_commands
-      raw_commands = request(:get, "/api/v1/commands.json")
-      commands = JSON.parse(raw_commands.body)
-
-      commands.each do |id, command|
-        result = evaluate_redis(command)
-        pretty = StringIO.new
-        PP.pp(result, pretty)
-
-        push :put, "/api/v1/commands/#{id}.json", {"response" => pretty.string.strip}
-      end
-    rescue *EXCEPTIONS => ex
-      exception(ex)
-    end
-
     def rotate_monitor(start, stop)
       payload = monitor.rotate.merge({
         "start" => start,
@@ -88,42 +71,6 @@ module Daikon
        push :post, "/api/v1/infos.json", redis.info
     rescue *EXCEPTIONS => ex
       exception(ex)
-    end
-
-    def evaluate_redis(command)
-      # Attempt to parse the given command string.
-      argv =
-        begin
-          Shellwords.shellwords(command.to_s)
-        rescue Exception => e
-          exception(e)
-          return e.message
-        end
-      return "No command received." unless argv[0]
-
-      begin
-        execute_redis(argv)
-      rescue Exception => e
-        exception(e)
-        e.message
-      end
-    end
-
-    def namespace
-      nil
-    end
-
-    def execute_redis(argv)
-      # Apply the current namespace to any fields that need it.
-      argv = namespace_input(namespace, *argv)
-
-      raise "Not a Redis command." unless argv.kind_of? Array
-
-      # Send the command to Redis.
-      result = redis.send(*argv)
-
-      # Remove the namespace from any commands that return a key.
-      denamespace_output namespace, argv.first, result
     end
   end
 end
