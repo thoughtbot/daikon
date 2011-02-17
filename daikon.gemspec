@@ -5,11 +5,11 @@
 
 Gem::Specification.new do |s|
   s.name = %q{daikon}
-  s.version = "0.7.4"
+  s.version = "0.7.5"
 
   s.required_rubygems_version = Gem::Requirement.new(">= 0") if s.respond_to? :required_rubygems_version=
   s.authors = ["Nick Quaranto"]
-  s.date = %q{2011-02-11}
+  s.date = %q{2011-02-17}
   s.default_executable = %q{daikon}
   s.description = %q{daikon, a radishapp.com client}
   s.email = %q{nick@quaran.to}
@@ -32,7 +32,6 @@ Gem::Specification.new do |s|
     "lib/daikon/configuration.rb",
     "lib/daikon/daemon.rb",
     "lib/daikon/monitor.rb",
-    "lib/daikon/namespace_tools.rb",
     "lib/daikon/redis_hacks.rb",
     "spec/client_spec.rb",
     "spec/configuration_spec.rb",

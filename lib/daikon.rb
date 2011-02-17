@@ -25,5 +25,5 @@ require 'daikon/monitor'
 require 'daikon/redis_hacks'
 
 module Daikon
-  VERSION = "0.7.4"
+  VERSION = "0.7.5"
 end
