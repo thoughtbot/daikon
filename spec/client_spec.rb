@@ -41,7 +41,7 @@ describe Daikon::Client, "when server is down" do
   subject       { Daikon::Client.new }
   before do
     subject.setup(Daikon::Configuration.new)
-    http = stub("http")
+    http = stub("http", :reset => nil)
     http.stubs(:request).raises(Timeout::Error)
     subject.stubs(:http => http)
   end
@@ -57,7 +57,7 @@ describe Daikon::Client, "when it returns bad json" do
   subject       { Daikon::Client.new }
   before do
     subject.setup(Daikon::Configuration.new)
-    http = stub("http", :request => Excon::Response.new(:body => "{'bad':'json}"))
+    http = stub("http", :request => Excon::Response.new(:body => "{'bad':'json}"), :reset => nil)
     subject.stubs(:http => http)
   end
 
@@ -76,6 +76,7 @@ shared_examples_for "a summary api consumer" do
       "Content-Type"   => "application/json"
     }
 
+    http.should have_received(:reset)
     http.should have_received(:request).with(
       :method  => "POST",
       :path    => "/api/v1/summaries.json",
@@ -86,7 +87,7 @@ end
 
 describe Daikon::Client, "rotate monitor" do
   subject     { Daikon::Client.new }
-  let(:http)  { stub("http", :request => Excon::Response.new) }
+  let(:http)  { stub("http", :request => Excon::Response.new, :reset => nil) }
   let(:now)   { "2011-01-19T18:23:55-05:00" }
   let(:past)  { "2011-01-19T18:23:54-05:00" }
   let(:payload) do
@@ -136,6 +137,7 @@ shared_examples_for "a info api consumer" do
       "Content-Type"   => "application/json"
     }
 
+    http.should have_received(:reset)
     http.should have_received(:request).with(
       :method  => "POST",
       :path    => "/api/v1/infos.json",
@@ -148,7 +150,7 @@ describe Daikon::Client, "report info" do
   subject       { Daikon::Client.new }
   let(:results) { {"connected_clients"=>"1", "used_cpu_sys_childrens"=>"0.00"} }
   let(:redis)   { stub("redis instance", :info => results) }
-  let(:http)    { stub("http", :request => Excon::Response.new) }
+  let(:http)    { stub("http", :request => Excon::Response.new, :reset => nil) }
 
   before do
     subject.stubs(:redis => redis, :http => http)

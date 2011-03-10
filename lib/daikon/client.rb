@@ -45,6 +45,7 @@ module Daikon
       options[:headers]['Authorization'] = config.api_key
 
       log "#{options[:method]} #{config.server_prefix}#{options[:path]}"
+      http.reset
       http.request(options)
     end
 

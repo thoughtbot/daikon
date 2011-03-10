@@ -12,7 +12,7 @@ GEM
       term-ansicolor (~> 1.0.5)
     daemons (1.1.0)
     diff-lcs (1.1.2)
-    excon (0.5.1)
+    excon (0.5.6)
     gherkin (2.2.9)
       json (~> 1.4.6)
       term-ansicolor (~> 1.0.5)
@@ -44,10 +44,10 @@ PLATFORMS
 DEPENDENCIES
   bourne
   cucumber
-  daemons (~> 1.1.0)
-  excon (~> 0.5.1)
+  daemons (= 1.1.0)
+  excon (= 0.5.6)
   jeweler
-  json_pure (~> 1.4.6)
-  redis (~> 2.1.1)
+  json_pure (= 1.4.6)
+  redis (= 2.1.1)
   rspec
   timecop
