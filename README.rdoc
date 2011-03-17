@@ -1,10 +1,29 @@
 = daikon
 
-Client gem for http://radishapp.com.
+Dig deep into Redis. This is a client daemon for http://radishapp.com.
 
-Borrowed a bunch of code from https://github.com/alexmchale/try.redis, thanks!
+== Setup
+
+Hook up Radish to your Redis instance like so, this will start a daemon up in
+your current directory:
+
+    daikon start -- -k 1234567890
+
+If you want to just test it out and run in the foreground:
+
+    daikon run -- -k 1234567890
+
+Your redis is on a different port, box, or has a password? No problem, use the
+-u option that takes a standard Redis url:
+
+    daikon start -- -k 1234567890 -u redis://4.2.2.2:9999
+
+== Issues
+
+If you need to run more than one Daikon instance to monitor more than one
+Redis, the current workaround is to `cd` into different directories and start
+a Daikon for each instance. Patches welcome for this!
 
 == Copyright
 
-Copyright (c) 2010 Nick Quaranto. See LICENSE.txt for
-further details.
+Copyright (c) 2010-2011 thoughtbot, Nick Quaranto. See LICENSE.txt for further details.
