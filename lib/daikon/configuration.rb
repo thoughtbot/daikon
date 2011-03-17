@@ -22,7 +22,7 @@ module Daikon
     end
 
     def validate_deprecated_options
-      if argv_matches?(/\-h|\-p/)
+      if argv_matches?(/^(\-h|\-p)$/)
         abort "Please use '-u redis://127.0.0.1:6379' format instead to specify redis url"
       end
     end

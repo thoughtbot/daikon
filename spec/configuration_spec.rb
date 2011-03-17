@@ -48,6 +48,14 @@ describe Daikon::Configuration do
     end
   end
 
+  it "does not fail if --help option given" do
+    capture do
+      lambda {
+        Daikon::Configuration.new(%w[--help])
+      }.should_not raise_error(SystemExit)
+    end
+  end
+
   it "fails if -p option given" do
     capture do
       lambda {
