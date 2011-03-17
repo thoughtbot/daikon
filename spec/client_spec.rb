@@ -40,11 +40,15 @@ end
 
 describe Daikon::Client, "when server is down" do
   subject       { Daikon::Client.new }
+  let(:redis)   { stub("redis instance", :info => {}) }
+
   before do
-    subject.setup(Daikon::Configuration.new)
+    Redis.stubs(:connect => redis)
     http = stub("http", :reset => nil)
     http.stubs(:request).raises(Timeout::Error)
     subject.stubs(:http => http)
+
+    subject.setup(Daikon::Configuration.new)
   end
 
   it "does not commit suicide" do
@@ -56,10 +60,14 @@ end
 
 describe Daikon::Client, "when it returns bad json" do
   subject       { Daikon::Client.new }
+  let(:redis)   { stub("redis instance", :info => {}) }
+
   before do
-    subject.setup(Daikon::Configuration.new)
+    Redis.stubs(:connect => redis)
     http = stub("http", :request => Excon::Response.new(:body => "{'bad':'json}"), :reset => nil)
     subject.stubs(:http => http)
+
+    subject.setup(Daikon::Configuration.new)
   end
 
   it "does not commit suicide" do
