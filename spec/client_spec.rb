@@ -6,19 +6,20 @@ describe Daikon::Client, "setup" do
   let(:redis)  { 'redis instance' }
 
   before do
-    Redis.stubs(:new => redis)
+    Redis.stubs(:connect => redis)
     subject.stubs(:redis=)
   end
 
   context "with overrides" do
-    let(:config) { Daikon::Configuration.new(%w[-h 8.8.8.8 -p 1234]) }
+    let(:url)    { "redis://8.8.8.8:1234" }
+    let(:config) { Daikon::Configuration.new(["-u", url]) }
 
     before do
       subject.setup(config, logger)
     end
 
     it "sets redis to listen on the given port" do
-      Redis.should have_received(:new).with(:host => "8.8.8.8", :port => "1234").twice
+      Redis.should have_received(:connect).with(:url => url).twice
       subject.should have_received(:redis=).with(redis)
     end
   end
@@ -31,7 +32,7 @@ describe Daikon::Client, "setup" do
     end
 
     it "sets redis to listen on the given port" do
-      Redis.should have_received(:new).with(:host => "127.0.0.1", :port => "6379").twice
+      Redis.should have_received(:connect).with(:url => "redis://0.0.0.0:6379").twice
       subject.should have_received(:redis=).with(redis)
     end
   end

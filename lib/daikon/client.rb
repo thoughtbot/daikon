@@ -20,7 +20,7 @@ module Daikon
     end
 
     def connect
-      Redis.new(:host => config.redis_host, :port => config.redis_port)
+      Redis.connect(:url => config.redis_url)
     end
 
     def start_monitor
