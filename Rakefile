@@ -27,18 +27,30 @@ Cucumber::Rake::Task.new(:features)
 
 task :default => :spec
 
+def parse_monitor
+  monitor = Daikon::Monitor.new(nil, nil)
+
+  File.open("monitor.log", "r") do |f|
+    until f.eof?
+      monitor.parse(f.readline)
+    end
+  end
+end
+
 desc "benchmark monitor.log against the monitor parsing"
 task :bench do
   require 'benchmark'
   Benchmark.bm do |bm|
     bm.report do
-      monitor = Daikon::Monitor.new(nil, nil)
-
-      File.open("monitor.log", "r") do |f|
-        until f.eof?
-          monitor.parse(f.readline)
-        end
-      end
+      parse_monitor
     end
+  end
+end
+
+desc "perf tools the monitor.log"
+task :perf do
+  require 'perftools'
+  PerfTools::CpuProfiler.start("daikon.profile") do
+    parse_monitor
   end
 end

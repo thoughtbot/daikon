@@ -44,3 +44,6 @@ pkg
 *.output
 *.log
 *.pid
+*.txt
+*.gif
+*.profile*

@@ -8,7 +8,7 @@ module Daikon
     OTHER_COMMANDS  = ["AUTH", "BGREWRITEAOF", "BGSAVE", "CONFIG GET", "CONFIG SET", "CONFIG RESETSTAT", "DBSIZE", "DEBUG OBJECT", "DEBUG SEGFAULT", "DISCARD", "ECHO", "EXEC", "FLUSHALL", "FLUSHDB", "INFO", "LASTSAVE", "MONITOR", "MULTI", "PING", "PSUBSCRIBE", "PUBLISH", "PUNSUBSCRIBE", "QUIT", "RANDOMKEY", "SAVE", "SELECT", "SHUTDOWN", "SUBSCRIBE", "SYNC", "UNSUBSCRIBE", "UNWATCH", "WATCH"].to_set
     ALL_COMMANDS    = READ_COMMANDS + WRITE_COMMANDS + OTHER_COMMANDS
 
-    NEW_FORMAT        = /^\+?(\d+\.\d+)( "[A-Z]+".*)/i
+    NEW_FORMAT        = /^\+?\d+\.\d+ "(.*)"$/i
     OLD_SINGLE_FORMAT = /^(#{NO_ARG_COMMANDS.join('|')})$/i
     OLD_MORE_FORMAT   = /^[A-Z]+ .*$/i
 
@@ -50,14 +50,14 @@ module Daikon
 
     def parse(line)
       if line =~ NEW_FORMAT
-        push($2)
+        push($1.split('" "'))
       elsif line =~ OLD_SINGLE_FORMAT || line =~ OLD_MORE_FORMAT
-        push(line)
+        push(line.split)
       end
     end
 
-    def push(raw_command)
-      command, key, *rest = raw_command.strip.gsub('"', '').split
+    def push(split_command)
+      command, key, *rest = split_command
       command.upcase!
 
       return unless ALL_COMMANDS.member?(command)
@@ -66,6 +66,9 @@ module Daikon
         incr_command(command)
         incr_total(command)
         if key
+          key.gsub!(".", "{PERIOD}") if key.include?('.')
+          key.gsub!("$", "{DOLLAR}") if key.include?('$')
+
           incr_key(key)
           incr_namespace(key)
         else
@@ -92,7 +95,7 @@ module Daikon
     end
 
     def incr_key(key)
-      data["keys"][key.gsub(".", "{PERIOD}").gsub("$", "{DOLLAR}")] += 1
+      data["keys"][key] += 1
     end
 
     def incr_total(command)
