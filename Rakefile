@@ -26,3 +26,19 @@ require 'cucumber/rake/task'
 Cucumber::Rake::Task.new(:features)
 
 task :default => :spec
+
+desc "benchmark monitor.log against the monitor parsing"
+task :bench do
+  require 'benchmark'
+  Benchmark.bm do |bm|
+    bm.report do
+      monitor = Daikon::Monitor.new(nil, nil)
+
+      File.open("monitor.log", "r") do |f|
+        until f.eof?
+          monitor.parse(f.readline)
+        end
+      end
+    end
+  end
+end
