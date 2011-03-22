@@ -78,9 +78,8 @@ module Daikon
     end
 
     def incr_namespace(key)
-      namespace, has_namespace = key.split(/(?::|-)/, 2)
-      if has_namespace
-        data["namespaces"][namespace] += 1
+      if marker = key =~ /:|-/
+        data["namespaces"][key[0...marker]] += 1
       else
         incr_global_namespace
       end
