@@ -8,7 +8,7 @@ module Daikon
     end
 
     def self.sleep_time
-      @@sleep_time ||= 1
+      @@sleep_time ||= 0.5
     end
 
     def self.run=(run)
