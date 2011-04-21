@@ -12,6 +12,10 @@ require 'bourne'
 
 RSpec.configure do |config|
   config.mock_with :mocha
+
+  config.before do
+    Daikon::Monitor.reset
+  end
 end
 
 # http://pivotallabs.com/users/alex/blog/articles/853-capturing-standard-out-in-unit-tests

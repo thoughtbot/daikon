@@ -1,6 +1,16 @@
 require 'spec_helper'
 
-describe Daikon::Monitor, "#rotate" do
+describe Daikon::Monitor, ".pop without data" do
+  it "clears out current data" do
+    Daikon::Monitor.pop do |summary|
+      summary["commands"].size.should be_zero
+      summary["totals"].size.should be_zero
+      summary["keys"].size.should be_zero
+    end
+  end
+end
+
+describe Daikon::Monitor, ".pop with data" do
   before do
     subject.parse("INCR foo")
     subject.parse("DECR foo")
@@ -9,44 +19,47 @@ describe Daikon::Monitor, "#rotate" do
     subject.parse("PING")
   end
 
-  it "clears out current data" do
-    subject.rotate
-    subject.data["commands"].size.should be_zero
-    subject.data["totals"].size.should be_zero
-    subject.data["keys"].size.should be_zero
-  end
-
   it "only saves the top 100 key listings" do
     150.times { |n| subject.parse("INCR foo#{n}") }
     150.times { |n| subject.parse("DECR foo#{n}") }
     100.times { |n| subject.parse("DEL foo#{n}") }
-    data = subject.rotate
-    data["keys"].size.should == 100
-    data["keys"].values.all? { |n| n == 3 }.should be_true
+
+    Daikon::Monitor.pop do |summary|
+      summary["keys"].size.should == 100
+      summary["keys"].values.all? { |n| n == 3 }.should be_true
+    end
   end
 
   it "santizes key names" do
     subject.parse("INCR $foo.zomg")
-    data = subject.rotate
-    data["keys"]["$foo.zomg"].should be_nil
-    data["keys"]["{DOLLAR}foo{PERIOD}zomg"].should == 1
+
+    Daikon::Monitor.pop do |summary|
+      summary["keys"]["$foo.zomg"].should be_nil
+      summary["keys"]["{DOLLAR}foo{PERIOD}zomg"].should == 1
+    end
   end
 
   it "increments each command type" do
-    subject.data["commands"]["INCR"].should == 1
-    subject.data["commands"]["DECR"].should == 2
+    Daikon::Monitor.pop do |summary|
+      summary["commands"]["INCR"].should == 1
+      summary["commands"]["DECR"].should == 2
+    end
   end
 
   it "keeps track of key accesses" do
-    subject.data["keys"]["foo"].should == 2
-    subject.data["keys"]["baz"].should == 1
+    Daikon::Monitor.pop do |summary|
+      summary["keys"]["foo"].should == 2
+      summary["keys"]["baz"].should == 1
+    end
   end
 
   it "tallies up totals of commands" do
-    subject.data["totals"]["all"].should == 5
-    subject.data["totals"]["read"].should == 1
-    subject.data["totals"]["write"].should == 3
-    subject.data["totals"]["other"].should == 1
+    Daikon::Monitor.pop do |summary|
+      summary["totals"]["all"].should == 5
+      summary["totals"]["read"].should == 1
+      summary["totals"]["write"].should == 3
+      summary["totals"]["other"].should == 1
+    end
   end
 end
 
@@ -132,18 +145,14 @@ describe Daikon::Monitor, "#parse with old input" do
   end
 end
 
-describe Daikon::Monitor, "#rotate with a bad command name" do
-  before do
+describe Daikon::Monitor, "#parse with a bad command name" do
+  it "does not save command" do
     subject.parse("gmail foo")
-  end
-
-  it "clears out current data" do
-    data = subject.rotate
-    data["commands"].size.should be_zero
+    subject.data["commands"].size.should be_zero
   end
 end
 
-describe Daikon::Monitor, "#rotate that collects namespaces" do
+describe Daikon::Monitor, "#parse with namespaces" do
   before do
     subject.parse("set g:2470920:mrn 9")
     subject.parse("get g:2470914:mrn")
@@ -154,23 +163,21 @@ describe Daikon::Monitor, "#rotate that collects namespaces" do
   end
 
   it "keeps track of namespace accesses" do
-    data = subject.rotate
-    data["namespaces"]["g"].should == 2
-    data["namespaces"]["global"].should == 3
-    data["namespaces"]["s3"].should == 1
+    subject.data["namespaces"]["g"].should == 2
+    subject.data["namespaces"]["global"].should == 3
+    subject.data["namespaces"]["s3"].should == 1
   end
 end
 
-describe Daikon::Monitor, "#rotate with values that have spaces" do
+describe Daikon::Monitor, "#parse with values that have spaces" do
   before do
     subject.parse("set g:2470920:mrn 11")
     subject.parse("Email Error")
   end
 
-  it "keeps track of namespace accesses" do
-    data = subject.rotate
-    data["commands"].should   == {"SET" => 1}
-    data["keys"].should       == {"g:2470920:mrn" => 1}
-    data["namespaces"].should == {"g" => 1}
+  it "counts them properly" do
+    subject.data["commands"].should   == {"SET" => 1}
+    subject.data["keys"].should       == {"g:2470920:mrn" => 1}
+    subject.data["namespaces"].should == {"g" => 1}
   end
 end

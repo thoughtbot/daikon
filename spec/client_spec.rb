@@ -110,10 +110,10 @@ describe Daikon::Client, "rotate monitor" do
   end
 
   before do
+    Daikon::Monitor.stubs(:pop).yields(data)
     Timecop.freeze DateTime.parse(now)
     subject.stubs(:http => http)
     subject.setup(config)
-    subject.monitor = stub("monitor", :rotate => data)
     subject.rotate_monitor(DateTime.parse(past), DateTime.parse(now))
   end
 

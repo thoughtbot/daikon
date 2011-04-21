@@ -58,12 +58,12 @@ module Daikon
     end
 
     def rotate_monitor(start, stop)
-      payload = monitor.rotate.merge({
-        "start" => start,
-        "stop"  => stop
-      })
+      Daikon::Monitor.pop do |summary|
+        summary["start"] = start
+        summary["stop"] = stop
 
-      push :post, "/api/v1/summaries.json", payload
+        push :post, "/api/v1/summaries.json", summary
+      end
     rescue *EXCEPTIONS => ex
       exception(ex)
     end

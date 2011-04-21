@@ -13,17 +13,36 @@ module Daikon
     OLD_MORE_FORMAT   = /^[A-Z]+ .*$/i
 
     def initialize(redis = nil, logger = nil)
-      @data   = data_hash
       @redis  = redis
       @logger = logger
       @mutex  = Mutex.new
     end
 
-    def data_hash
+    def self.reset
+      data.clear
+      data.replace(data_hash)
+    end
+
+    def self.pop
+      summary = self.data.dup
+      summary["keys"] = Hash[*summary["keys"].sort_by(&:last).reverse[0..99].flatten]
+      yield(summary)
+      reset
+    end
+
+    def self.data
+      @summaries ||= data_hash
+    end
+
+    def self.data_hash
       {"commands"   => Hash.new(0),
        "keys"       => Hash.new(0),
        "namespaces" => Hash.new(0),
        "totals"     => Hash.new(0)}
+    end
+
+    def data
+      self.class.data
     end
 
     def start
@@ -32,20 +51,6 @@ module Daikon
           parse(line)
         end
       end
-    end
-
-    def lock(&block)
-      @mutex.synchronize(&block)
-    end
-
-    def rotate
-      this_data = nil
-      lock do
-        this_data = self.data.dup
-        self.data.replace(data_hash)
-      end
-      this_data["keys"] = Hash[*this_data["keys"].sort_by(&:last).reverse[0..99].flatten]
-      this_data
     end
 
     def parse(line)
@@ -62,18 +67,16 @@ module Daikon
 
       return unless ALL_COMMANDS.member?(command)
 
-      lock do
-        incr_command(command)
-        incr_total(command)
-        if key
-          key.gsub!(".", "{PERIOD}") if key.include?('.')
-          key.gsub!("$", "{DOLLAR}") if key.include?('$')
+      incr_command(command)
+      incr_total(command)
+      if key
+        key.gsub!(".", "{PERIOD}") if key.include?('.')
+        key.gsub!("$", "{DOLLAR}") if key.include?('$')
 
-          incr_key(key)
-          incr_namespace(key)
-        else
-          incr_global_namespace
-        end
+        incr_key(key)
+        incr_namespace(key)
+      else
+        incr_global_namespace
       end
     end
 
