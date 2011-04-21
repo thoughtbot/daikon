@@ -3,59 +3,41 @@ module Daikon
     INFO_INTERVAL    = ENV["INFO_INTERVAL"] || 10
     SUMMARY_INTERVAL = ENV["SUMMARY_INTERVAL"] || 60
 
-    def self.sleep_time=(sleep_time)
-      @@sleep_time = sleep_time
-    end
-
-    def self.sleep_time
-      @@sleep_time ||= 1
-    end
-
-    def self.run=(run)
-      @@run = run
-    end
-
-    def self.run
-      @@run
-    end
-
     def self.start(argv, ontop = false)
-      self.run = true
-      config = Daikon::Configuration.new(argv)
-
-      if argv.include?("-v") || argv.include?("--version")
-        puts "Daikon v#{VERSION}"
-        return
-      end
-
       Daemons.run_proc("daikon", :ARGV => argv, :log_output => true, :backtrace => true, :ontop => ontop) do
+        config = Daikon::Configuration.new(argv)
+
+        if argv.include?("-v") || argv.include?("--version")
+          puts "Daikon v#{VERSION}"
+          return
+        end
+
         if argv.include?("run")
           logger = Logger.new(STDOUT)
         else
           logger = Logger.new("/tmp/radish.log")
         end
 
-        rotated_at  = Time.now
-        reported_at = Time.now
-        client      = Daikon::Client.new
-
+        client = Daikon::Client.new
         client.setup(config, logger)
-        client.start_monitor
 
-        while self.run do
-          now = Time.now
+        EventMachine::run do
+          hiredis   = EventMachine::Hiredis.connect
+          himonitor = EventMachine::Hiredis.connect
 
-          if now - reported_at >= sleep_time * INFO_INTERVAL.to_i
-            client.report_info
-            reported_at = now
+          himonitor.monitor do |line|
+            Daikon::Monitor.parse(line)
           end
 
-          if now - rotated_at >= sleep_time * SUMMARY_INTERVAL.to_i
-            client.rotate_monitor(rotated_at, now)
-            rotated_at = now
+          EventMachine::add_periodic_timer(10) do
+            hiredis.info do |info|
+              client.report_info info
+            end
           end
 
-          sleep sleep_time
+          EventMachine::add_periodic_timer(60) do
+            client.report_summaries
+          end
         end
       end
     end

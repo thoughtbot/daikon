@@ -1,3 +1,9 @@
+PATH
+  remote: ../em-hiredis
+  specs:
+    em-hiredis (0.0.1)
+      hiredis (~> 0.3.0)
+
 GEM
   remote: http://rubygems.org/
   specs:
@@ -12,11 +18,13 @@ GEM
       term-ansicolor (~> 1.0.5)
     daemons (1.1.0)
     diff-lcs (1.1.2)
+    eventmachine (0.12.10)
     excon (0.5.6)
     gherkin (2.2.9)
       json (~> 1.4.6)
       term-ansicolor (~> 1.0.5)
     git (1.2.5)
+    hiredis (0.3.1)
     jeweler (1.5.1)
       bundler (~> 1.0.0)
       git (>= 1.2.5)
@@ -45,6 +53,8 @@ DEPENDENCIES
   bourne
   cucumber
   daemons (= 1.1.0)
+  em-hiredis!
+  eventmachine (= 0.12.10)
   excon (= 0.5.6)
   jeweler
   json_pure (= 1.4.6)

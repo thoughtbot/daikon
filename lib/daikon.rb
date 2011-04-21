@@ -7,6 +7,8 @@ require 'socket'
 require 'stringio'
 require 'thread'
 
+require 'em-hiredis'
+require 'eventmachine'
 require 'excon'
 require 'daemons'
 require 'json'

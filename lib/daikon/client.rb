@@ -7,24 +7,14 @@ module Daikon
                   JSON::ParserError,
                   Excon::Errors::SocketError]
 
-    attr_accessor :redis, :logger, :config, :http, :monitor
+    attr_accessor :logger, :config, :http
 
     def setup(config, logger = nil)
       self.config  = config
       self.logger  = logger
-      self.redis   = connect
-      self.monitor = Monitor.new(connect, logger)
       self.http    = Excon.new(config.server_prefix)
 
       log "Started Daikon v#{VERSION}"
-    end
-
-    def connect
-      Redis.connect(:url => config.redis_url)
-    end
-
-    def start_monitor
-      monitor.start
     end
 
     def log(message)
@@ -57,19 +47,22 @@ module Daikon
                                 "Content-Type"   => "application/json"})
     end
 
-    def rotate_monitor(start, stop)
-      payload = monitor.rotate.merge({
-        "start" => start,
-        "stop"  => stop
-      })
+    def report_summaries
+      Daikon::Monitor.pop do |summary|
+        require 'pp'
+        pp summary
+        report_summary(summary)
+      end
+    end
 
-      push :post, "/api/v1/summaries.json", payload
+    def report_summary(summary)
+      push :post, "/api/v1/summaries.json", summary
     rescue *EXCEPTIONS => ex
       exception(ex)
     end
 
-    def report_info
-       push :post, "/api/v1/infos.json", redis.info
+    def report_info(info)
+       push :post, "/api/v1/infos.json", info
     rescue *EXCEPTIONS => ex
       exception(ex)
     end
