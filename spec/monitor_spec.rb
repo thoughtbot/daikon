@@ -12,17 +12,17 @@ end
 
 describe Daikon::Monitor, ".pop with summaries" do
   before do
-    subject.parse("INCR foo")
-    subject.parse("DECR foo")
-    subject.parse("DECR baz")
-    subject.parse("HGETALL faz")
-    subject.parse("PING")
+    parse("INCR foo")
+    parse("DECR foo")
+    parse("DECR baz")
+    parse("HGETALL faz")
+    parse("PING")
   end
 
   it "only saves the top 100 key listings" do
-    150.times { |n| subject.parse("INCR foo#{n}") }
-    150.times { |n| subject.parse("DECR foo#{n}") }
-    100.times { |n| subject.parse("DEL foo#{n}") }
+    150.times { |n| parse("INCR foo#{n}") }
+    150.times { |n| parse("DECR foo#{n}") }
+    100.times { |n| parse("DEL foo#{n}") }
 
     Daikon::Monitor.pop do |summary|
       summary["keys"].size.should == 100
@@ -31,7 +31,7 @@ describe Daikon::Monitor, ".pop with summaries" do
   end
 
   it "santizes key names" do
-    subject.parse("INCR $foo.zomg")
+    parse("INCR $foo.zomg")
 
     Daikon::Monitor.pop do |summary|
       summary["keys"]["$foo.zomg"].should be_nil
@@ -64,82 +64,88 @@ describe Daikon::Monitor, ".pop with summaries" do
 end
 
 describe Daikon::Monitor, "#parse with new format" do
-  subject    { Daikon::Monitor.new }
-  let(:line) { '1291699658.994073 "decrby" "fooz" "2000"' }
+  before do
+    parse('1291699658.994073 "decrby" "fooz" "2000"')
+  end
 
   it "parses the log into json" do
-    subject.parse(line)
-    subject.summaries["commands"]["DECRBY"].should == 1
-    subject.summaries["keys"]["fooz"].should == 1
-    subject.summaries["totals"]["all"].should == 1
-    subject.summaries["totals"]["write"].should == 1
+    Daikon::Monitor.pop do |summary|
+      summary["commands"]["DECRBY"].should == 1
+      summary["keys"]["fooz"].should == 1
+      summary["totals"]["all"].should == 1
+      summary["totals"]["write"].should == 1
+    end
   end
 end
 
 describe Daikon::Monitor, "#parse with new format that has reply byte" do
-  subject    { Daikon::Monitor.new }
-  let(:line) { '+1291699658.994073 "decrby" "fooz" "2000"' }
+  before do
+    parse('+1291699658.994073 "decrby" "fooz" "2000"')
+  end
 
   it "parses the log into json" do
-    subject.parse(line)
-    subject.summaries["commands"]["DECRBY"].should == 1
-    subject.summaries["keys"]["fooz"].should == 1
-    subject.summaries["totals"]["all"].should == 1
-    subject.summaries["totals"]["write"].should == 1
+    Daikon::Monitor.pop do |summary|
+      summary["commands"]["DECRBY"].should == 1
+      summary["keys"]["fooz"].should == 1
+      summary["totals"]["all"].should == 1
+      summary["totals"]["write"].should == 1
+    end
   end
 end
 
 describe Daikon::Monitor, "#parse with old multi line input" do
-  subject { Daikon::Monitor.new }
+  before do
+    parse("incr foo")
+    parse("sismember project-13897-global-error-classes 17")
+    parse("incrApiParameterError")
+    parse("decr foo")
+  end
 
   it "parses logs" do
-    subject.parse("incr foo")
-    subject.parse("sismember project-13897-global-error-classes 17")
-    subject.parse("incrApiParameterError")
-    subject.parse("decr foo")
-
-    subject.summaries["commands"]["DECR"].should == 1
-    subject.summaries["commands"]["INCR"].should == 1
-    subject.summaries["commands"]["SISMEMBER"].should == 1
-    subject.summaries["keys"]["foo"].should == 2
-    subject.summaries["keys"]["project-13897-global-error-classes"].should == 1
-    subject.summaries["totals"]["all"].should == 3
-    subject.summaries["totals"]["write"].should == 2
-    subject.summaries["totals"]["read"].should == 1
+    Daikon::Monitor.pop do |summary|
+      subject.summaries["commands"]["DECR"].should == 1
+      subject.summaries["commands"]["INCR"].should == 1
+      subject.summaries["commands"]["SISMEMBER"].should == 1
+      subject.summaries["keys"]["foo"].should == 2
+      subject.summaries["keys"]["project-13897-global-error-classes"].should == 1
+      subject.summaries["totals"]["all"].should == 3
+      subject.summaries["totals"]["write"].should == 2
+      subject.summaries["totals"]["read"].should == 1
+    end
   end
 end
 
 describe Daikon::Monitor, "#parse with old input" do
-  subject { Daikon::Monitor.new }
-
   shared_examples_for "a valid parser" do
     it "parses the given commands properly" do
-      subject.summaries["commands"]["DECR"].should == 1
-      subject.summaries["commands"]["INCR"].should == 1
-      subject.summaries["commands"]["SET"].should == 1
-      subject.summaries["keys"]["foo"].should == 2
-      subject.summaries["keys"]["g:2470920:mrn"].should == 1
-      subject.summaries["totals"]["all"].should == 3
-      subject.summaries["totals"]["write"].should == 3
+      Daikon::Monitor.pop do |summary|
+        subject.summaries["commands"]["DECR"].should == 1
+        subject.summaries["commands"]["INCR"].should == 1
+        subject.summaries["commands"]["SET"].should == 1
+        subject.summaries["keys"]["foo"].should == 2
+        subject.summaries["keys"]["g:2470920:mrn"].should == 1
+        subject.summaries["totals"]["all"].should == 3
+        subject.summaries["totals"]["write"].should == 3
+      end
     end
   end
 
   context "with a bulk input that is a number" do
     before do
-      subject.parse("incr foo")
-      subject.parse("set g:2470920:mrn 9")
-      subject.parse("554079885")
-      subject.parse("decr foo")
+      parse("incr foo")
+      parse("set g:2470920:mrn 9")
+      parse("554079885")
+      parse("decr foo")
     end
     it_should_behave_like "a valid parser"
   end
 
   context "with a bulk input that is a number" do
     before do
-      subject.parse("incr foo")
-      subject.parse("set g:2470920:mrn 9")
-      subject.parse("46fdcf77c1bb2108e6191602c2f5f9ae")
-      subject.parse("decr foo")
+      parse("incr foo")
+      parse("set g:2470920:mrn 9")
+      parse("46fdcf77c1bb2108e6191602c2f5f9ae")
+      parse("decr foo")
     end
     it_should_behave_like "a valid parser"
   end
@@ -147,37 +153,43 @@ end
 
 describe Daikon::Monitor, "#parse with a bad command name" do
   it "does not save command" do
-    subject.parse("gmail foo")
-    subject.summaries["commands"].size.should be_zero
+    parse("gmail foo")
+    Daikon::Monitor.pop do |summary|
+      summary["commands"].size.should be_zero
+    end
   end
 end
 
 describe Daikon::Monitor, "#parse with namespaces" do
   before do
-    subject.parse("set g:2470920:mrn 9")
-    subject.parse("get g:2470914:mrn")
-    subject.parse("incr s3-queue-key")
-    subject.parse("info")
-    subject.parse("decr somehorriblynamespacedkey")
-    subject.parse("flushdb")
+    parse("set g:2470920:mrn 9")
+    parse("get g:2470914:mrn")
+    parse("incr s3-queue-key")
+    parse("info")
+    parse("decr somehorriblynamespacedkey")
+    parse("flushdb")
   end
 
   it "keeps track of namespace accesses" do
-    subject.summaries["namespaces"]["g"].should == 2
-    subject.summaries["namespaces"]["global"].should == 3
-    subject.summaries["namespaces"]["s3"].should == 1
+    Daikon::Monitor.pop do |summary|
+      summary["namespaces"]["g"].should == 2
+      summary["namespaces"]["global"].should == 3
+      summary["namespaces"]["s3"].should == 1
+    end
   end
 end
 
 describe Daikon::Monitor, "#parse with values that have spaces" do
   before do
-    subject.parse("set g:2470920:mrn 11")
-    subject.parse("Email Error")
+    parse("set g:2470920:mrn 11")
+    parse("Email Error")
   end
 
   it "counts them properly" do
-    subject.summaries["commands"].should   == {"SET" => 1}
-    subject.summaries["keys"].should       == {"g:2470920:mrn" => 1}
-    subject.summaries["namespaces"].should == {"g" => 1}
+    Daikon::Monitor.pop do |summary|
+      summary["commands"].should   == {"SET" => 1}
+      summary["keys"].should       == {"g:2470920:mrn" => 1}
+      summary["namespaces"].should == {"g" => 1}
+    end
   end
 end

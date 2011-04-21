@@ -12,10 +12,8 @@ module Daikon
     OLD_SINGLE_FORMAT = /^(#{NO_ARG_COMMANDS.join('|')})$/i
     OLD_MORE_FORMAT   = /^[A-Z]+ .*$/i
 
-    def initialize(redis = nil, logger = nil)
-      @redis  = redis
-      @logger = logger
-      @mutex  = Mutex.new
+    def self.parse(line)
+      new.parse(line)
     end
 
     def self.reset
@@ -45,9 +43,9 @@ module Daikon
       self.class.summaries
     end
 
-    def start
+    def self.start(redis)
       Thread.new do
-        @redis.monitor do |line|
+        redis.monitor do |line|
           parse(line)
         end
       end

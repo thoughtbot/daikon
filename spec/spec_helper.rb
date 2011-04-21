@@ -10,20 +10,16 @@ Dir["#{File.dirname(__FILE__)}/support/**/*.rb"].each {|f| require f}
 require 'timecop'
 require 'bourne'
 
+require 'support/capture_helper'
+require 'support/parse_helper'
+
 RSpec.configure do |config|
   config.mock_with :mocha
+
+  config.include CaptureHelper
+  config.include ParseHelper
 
   config.before do
     Daikon::Monitor.reset
   end
-end
-
-# http://pivotallabs.com/users/alex/blog/articles/853-capturing-standard-out-in-unit-tests
-def capture
-  output = StringIO.new
-  $stderr = output
-  yield
-  output.string
-ensure
-  $stderr = STDERR
 end
