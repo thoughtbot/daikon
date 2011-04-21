@@ -1,7 +1,7 @@
 require 'spec_helper'
 
-describe Daikon::Monitor, ".pop without data" do
-  it "clears out current data" do
+describe Daikon::Monitor, ".pop without summaries" do
+  it "clears out current summaries" do
     Daikon::Monitor.pop do |summary|
       summary["commands"].size.should be_zero
       summary["totals"].size.should be_zero
@@ -10,7 +10,7 @@ describe Daikon::Monitor, ".pop without data" do
   end
 end
 
-describe Daikon::Monitor, ".pop with data" do
+describe Daikon::Monitor, ".pop with summaries" do
   before do
     subject.parse("INCR foo")
     subject.parse("DECR foo")
@@ -69,10 +69,10 @@ describe Daikon::Monitor, "#parse with new format" do
 
   it "parses the log into json" do
     subject.parse(line)
-    subject.data["commands"]["DECRBY"].should == 1
-    subject.data["keys"]["fooz"].should == 1
-    subject.data["totals"]["all"].should == 1
-    subject.data["totals"]["write"].should == 1
+    subject.summaries["commands"]["DECRBY"].should == 1
+    subject.summaries["keys"]["fooz"].should == 1
+    subject.summaries["totals"]["all"].should == 1
+    subject.summaries["totals"]["write"].should == 1
   end
 end
 
@@ -82,10 +82,10 @@ describe Daikon::Monitor, "#parse with new format that has reply byte" do
 
   it "parses the log into json" do
     subject.parse(line)
-    subject.data["commands"]["DECRBY"].should == 1
-    subject.data["keys"]["fooz"].should == 1
-    subject.data["totals"]["all"].should == 1
-    subject.data["totals"]["write"].should == 1
+    subject.summaries["commands"]["DECRBY"].should == 1
+    subject.summaries["keys"]["fooz"].should == 1
+    subject.summaries["totals"]["all"].should == 1
+    subject.summaries["totals"]["write"].should == 1
   end
 end
 
@@ -98,14 +98,14 @@ describe Daikon::Monitor, "#parse with old multi line input" do
     subject.parse("incrApiParameterError")
     subject.parse("decr foo")
 
-    subject.data["commands"]["DECR"].should == 1
-    subject.data["commands"]["INCR"].should == 1
-    subject.data["commands"]["SISMEMBER"].should == 1
-    subject.data["keys"]["foo"].should == 2
-    subject.data["keys"]["project-13897-global-error-classes"].should == 1
-    subject.data["totals"]["all"].should == 3
-    subject.data["totals"]["write"].should == 2
-    subject.data["totals"]["read"].should == 1
+    subject.summaries["commands"]["DECR"].should == 1
+    subject.summaries["commands"]["INCR"].should == 1
+    subject.summaries["commands"]["SISMEMBER"].should == 1
+    subject.summaries["keys"]["foo"].should == 2
+    subject.summaries["keys"]["project-13897-global-error-classes"].should == 1
+    subject.summaries["totals"]["all"].should == 3
+    subject.summaries["totals"]["write"].should == 2
+    subject.summaries["totals"]["read"].should == 1
   end
 end
 
@@ -114,13 +114,13 @@ describe Daikon::Monitor, "#parse with old input" do
 
   shared_examples_for "a valid parser" do
     it "parses the given commands properly" do
-      subject.data["commands"]["DECR"].should == 1
-      subject.data["commands"]["INCR"].should == 1
-      subject.data["commands"]["SET"].should == 1
-      subject.data["keys"]["foo"].should == 2
-      subject.data["keys"]["g:2470920:mrn"].should == 1
-      subject.data["totals"]["all"].should == 3
-      subject.data["totals"]["write"].should == 3
+      subject.summaries["commands"]["DECR"].should == 1
+      subject.summaries["commands"]["INCR"].should == 1
+      subject.summaries["commands"]["SET"].should == 1
+      subject.summaries["keys"]["foo"].should == 2
+      subject.summaries["keys"]["g:2470920:mrn"].should == 1
+      subject.summaries["totals"]["all"].should == 3
+      subject.summaries["totals"]["write"].should == 3
     end
   end
 
@@ -148,7 +148,7 @@ end
 describe Daikon::Monitor, "#parse with a bad command name" do
   it "does not save command" do
     subject.parse("gmail foo")
-    subject.data["commands"].size.should be_zero
+    subject.summaries["commands"].size.should be_zero
   end
 end
 
@@ -163,9 +163,9 @@ describe Daikon::Monitor, "#parse with namespaces" do
   end
 
   it "keeps track of namespace accesses" do
-    subject.data["namespaces"]["g"].should == 2
-    subject.data["namespaces"]["global"].should == 3
-    subject.data["namespaces"]["s3"].should == 1
+    subject.summaries["namespaces"]["g"].should == 2
+    subject.summaries["namespaces"]["global"].should == 3
+    subject.summaries["namespaces"]["s3"].should == 1
   end
 end
 
@@ -176,8 +176,8 @@ describe Daikon::Monitor, "#parse with values that have spaces" do
   end
 
   it "counts them properly" do
-    subject.data["commands"].should   == {"SET" => 1}
-    subject.data["keys"].should       == {"g:2470920:mrn" => 1}
-    subject.data["namespaces"].should == {"g" => 1}
+    subject.summaries["commands"].should   == {"SET" => 1}
+    subject.summaries["keys"].should       == {"g:2470920:mrn" => 1}
+    subject.summaries["namespaces"].should == {"g" => 1}
   end
 end

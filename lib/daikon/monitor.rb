@@ -1,6 +1,6 @@
 module Daikon
   class Monitor
-    attr_accessor :data
+    attr_accessor :summaries
 
     NO_ARG_COMMANDS = ["BGREWRITEAOF", "BGSAVE", "CONFIG RESETSTAT", "DBSIZE", "DEBUG SEGFAULT", "DISCARD", "EXEC", "FLUSHALL", "FLUSHDB", "INFO", "LASTSAVE", "MONITOR", "MULTI", "PING", "QUIT", "RANDOMKEY", "SAVE", "SHUTDOWN", "SYNC", "UNWATCH"]
     READ_COMMANDS   = ["EXISTS", "GET", "GETBIT", "GETRANGE", "HEXISTS", "HGET", "HGETALL", "HKEYS", "HLEN", "HMGET", "HVALS", "KEYS", "LINDEX", "LLEN", "LRANGE", "MGET", "SCARD", "SDIFF", "SINTER", "SISMEMBER", "SMEMBERS", "SORT", "SRANDMEMBER", "STRLEN", "SUNION", "TTL", "TYPE", "ZCARD", "ZCOUNT", "ZRANGE", "ZRANGEBYSCORE", "ZRANK", "ZREVRANGE", "ZREVRANGEBYSCORE", "ZREVRANK", "ZSCORE"].to_set
@@ -19,30 +19,30 @@ module Daikon
     end
 
     def self.reset
-      data.clear
-      data.replace(data_hash)
+      summaries.clear
+      summaries.replace(summaries_hash)
     end
 
     def self.pop
-      summary = self.data.dup
+      summary = self.summaries.dup
       summary["keys"] = Hash[*summary["keys"].sort_by(&:last).reverse[0..99].flatten]
       yield(summary)
       reset
     end
 
-    def self.data
-      @summaries ||= data_hash
+    def self.summaries
+      @@summaries ||= summaries_hash
     end
 
-    def self.data_hash
+    def self.summaries_hash
       {"commands"   => Hash.new(0),
        "keys"       => Hash.new(0),
        "namespaces" => Hash.new(0),
        "totals"     => Hash.new(0)}
     end
 
-    def data
-      self.class.data
+    def summaries
+      self.class.summaries
     end
 
     def start
@@ -82,33 +82,33 @@ module Daikon
 
     def incr_namespace(key)
       if marker = key =~ /:|-/
-        data["namespaces"][key[0...marker]] += 1
+        summaries["namespaces"][key[0...marker]] += 1
       else
         incr_global_namespace
       end
     end
 
     def incr_global_namespace
-      data["namespaces"]["global"] += 1
+      summaries["namespaces"]["global"] += 1
     end
 
     def incr_command(command)
-      data["commands"][command] += 1
+      summaries["commands"][command] += 1
     end
 
     def incr_key(key)
-      data["keys"][key] += 1
+      summaries["keys"][key] += 1
     end
 
     def incr_total(command)
-      data["totals"]["all"] += 1
+      summaries["totals"]["all"] += 1
 
       if READ_COMMANDS.member?(command)
-        data["totals"]["read"] += 1
+        summaries["totals"]["read"] += 1
       elsif WRITE_COMMANDS.member?(command)
-        data["totals"]["write"] += 1
+        summaries["totals"]["write"] += 1
       elsif OTHER_COMMANDS.member?(command)
-        data["totals"]["other"] += 1
+        summaries["totals"]["other"] += 1
       end
     end
   end
