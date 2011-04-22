@@ -4,6 +4,7 @@ describe Daikon::Daemon do
   let(:client) { stub("client") }
 
   before do
+    Timecop.return
     Daikon::Client.stubs(:new => client)
     Daikon::Daemon.sleep_time = 0.05
     client.stubs(:setup => true,

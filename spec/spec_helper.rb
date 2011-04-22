@@ -20,6 +20,11 @@ RSpec.configure do |config|
   config.include ParseHelper
 
   config.before do
+    Timecop.freeze(DateTime.now)
     Daikon::Monitor.reset
+  end
+
+  config.after do
+    Timecop.return
   end
 end

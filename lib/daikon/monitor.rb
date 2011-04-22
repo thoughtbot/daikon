@@ -1,7 +1,5 @@
 module Daikon
   class Monitor
-    attr_accessor :summaries
-
     NO_ARG_COMMANDS = ["BGREWRITEAOF", "BGSAVE", "CONFIG RESETSTAT", "DBSIZE", "DEBUG SEGFAULT", "DISCARD", "EXEC", "FLUSHALL", "FLUSHDB", "INFO", "LASTSAVE", "MONITOR", "MULTI", "PING", "QUIT", "RANDOMKEY", "SAVE", "SHUTDOWN", "SYNC", "UNWATCH"]
     READ_COMMANDS   = ["EXISTS", "GET", "GETBIT", "GETRANGE", "HEXISTS", "HGET", "HGETALL", "HKEYS", "HLEN", "HMGET", "HVALS", "KEYS", "LINDEX", "LLEN", "LRANGE", "MGET", "SCARD", "SDIFF", "SINTER", "SISMEMBER", "SMEMBERS", "SORT", "SRANDMEMBER", "STRLEN", "SUNION", "TTL", "TYPE", "ZCARD", "ZCOUNT", "ZRANGE", "ZRANGEBYSCORE", "ZRANK", "ZREVRANGE", "ZREVRANGEBYSCORE", "ZREVRANK", "ZSCORE"].to_set
     WRITE_COMMANDS  = ["APPEND", "BLPOP", "BRPOP", "BRPOPLPUSH", "DECR", "DECRBY", "DEL", "GETSET", "EXPIRE", "EXPIREAT", "HDEL", "HINCRBY", "HMSET", "HSET", "HSETNX", "INCR", "INCRBY", "LINSERT", "LPOP", "LPUSH", "LPUSHX", "LREM", "LSET", "LTRIM", "MOVE", "MSET", "MSETNX", "PERSIST", "RENAME", "RENAMENX", "RPOP", "RPOPLPUSH", "RPUSH", "RPUSHX", "SADD", "SDIFFSTORE", "SET", "SETBIT", "SETEX", "SETNX", "SETRANGE", "SINTERSTORE", "SMOVE", "SPOP", "SREM", "SUNIONSTORE", "ZADD", "ZINCRBY", "ZINTERSTORE", "ZREM", "ZREMRANGEBYRANK", "ZREMRANGEBYSCORE", "ZUNIONSTORE"].to_set
@@ -18,29 +16,40 @@ module Daikon
 
     def self.reset
       summaries.clear
-      summaries.replace(summaries_hash)
     end
 
     def self.pop
-      summary = self.summaries.dup
+      time, summary = self.summaries.first
+      if summary.nil?
+        summary = summary_hash
+      end
+      summary["start"] = summary["stop"] = Time.now
       summary["keys"] = Hash[*summary["keys"].sort_by(&:last).reverse[0..99].flatten]
       yield(summary)
-      reset
+      summaries.delete(time) if time
     end
 
     def self.summaries
-      @@summaries ||= summaries_hash
+      @@summaries ||= {}
     end
 
-    def self.summaries_hash
+    def self.current_summary(time)
+      summaries[time] ||= summary_hash
+    end
+
+    def self.summary_hash
       {"commands"   => Hash.new(0),
        "keys"       => Hash.new(0),
        "namespaces" => Hash.new(0),
        "totals"     => Hash.new(0)}
     end
 
-    def summaries
-      self.class.summaries
+    def initialize
+      @now = Time.now.utc.strftime("%Y-%m-%d %H:%M:00 %Z")
+    end
+
+    def current_summary
+      self.class.current_summary(@now)
     end
 
     def self.start(redis)
@@ -80,33 +89,33 @@ module Daikon
 
     def incr_namespace(key)
       if marker = key =~ /:|-/
-        summaries["namespaces"][key[0...marker]] += 1
+        current_summary["namespaces"][key[0...marker]] += 1
       else
         incr_global_namespace
       end
     end
 
     def incr_global_namespace
-      summaries["namespaces"]["global"] += 1
+      current_summary["namespaces"]["global"] += 1
     end
 
     def incr_command(command)
-      summaries["commands"][command] += 1
+      current_summary["commands"][command] += 1
     end
 
     def incr_key(key)
-      summaries["keys"][key] += 1
+      current_summary["keys"][key] += 1
     end
 
     def incr_total(command)
-      summaries["totals"]["all"] += 1
+      current_summary["totals"]["all"] += 1
 
       if READ_COMMANDS.member?(command)
-        summaries["totals"]["read"] += 1
+        current_summary["totals"]["read"] += 1
       elsif WRITE_COMMANDS.member?(command)
-        summaries["totals"]["write"] += 1
+        current_summary["totals"]["write"] += 1
       elsif OTHER_COMMANDS.member?(command)
-        summaries["totals"]["other"] += 1
+        current_summary["totals"]["other"] += 1
       end
     end
   end

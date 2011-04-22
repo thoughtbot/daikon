@@ -19,7 +19,7 @@ describe Daikon::Client, "setup" do
     end
 
     it "sets redis to listen on the given port" do
-      Redis.should have_received(:connect).with(:url => url).twice
+      Redis.should have_received(:connect).with(:url => url).once
       subject.should have_received(:redis=).with(redis)
     end
   end
@@ -32,7 +32,7 @@ describe Daikon::Client, "setup" do
     end
 
     it "sets redis to listen on the given port" do
-      Redis.should have_received(:connect).with(:url => "redis://0.0.0.0:6379").twice
+      Redis.should have_received(:connect).with(:url => "redis://0.0.0.0:6379").once
       subject.should have_received(:redis=).with(redis)
     end
   end

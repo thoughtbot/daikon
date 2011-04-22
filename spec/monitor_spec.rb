@@ -103,14 +103,14 @@ describe Daikon::Monitor, "#parse with old multi line input" do
 
   it "parses logs" do
     Daikon::Monitor.pop do |summary|
-      subject.summaries["commands"]["DECR"].should == 1
-      subject.summaries["commands"]["INCR"].should == 1
-      subject.summaries["commands"]["SISMEMBER"].should == 1
-      subject.summaries["keys"]["foo"].should == 2
-      subject.summaries["keys"]["project-13897-global-error-classes"].should == 1
-      subject.summaries["totals"]["all"].should == 3
-      subject.summaries["totals"]["write"].should == 2
-      subject.summaries["totals"]["read"].should == 1
+      summary["commands"]["DECR"].should == 1
+      summary["commands"]["INCR"].should == 1
+      summary["commands"]["SISMEMBER"].should == 1
+      summary["keys"]["foo"].should == 2
+      summary["keys"]["project-13897-global-error-classes"].should == 1
+      summary["totals"]["all"].should == 3
+      summary["totals"]["write"].should == 2
+      summary["totals"]["read"].should == 1
     end
   end
 end
@@ -119,13 +119,13 @@ describe Daikon::Monitor, "#parse with old input" do
   shared_examples_for "a valid parser" do
     it "parses the given commands properly" do
       Daikon::Monitor.pop do |summary|
-        subject.summaries["commands"]["DECR"].should == 1
-        subject.summaries["commands"]["INCR"].should == 1
-        subject.summaries["commands"]["SET"].should == 1
-        subject.summaries["keys"]["foo"].should == 2
-        subject.summaries["keys"]["g:2470920:mrn"].should == 1
-        subject.summaries["totals"]["all"].should == 3
-        subject.summaries["totals"]["write"].should == 3
+        summary["commands"]["DECR"].should == 1
+        summary["commands"]["INCR"].should == 1
+        summary["commands"]["SET"].should == 1
+        summary["keys"]["foo"].should == 2
+        summary["keys"]["g:2470920:mrn"].should == 1
+        summary["totals"]["all"].should == 3
+        summary["totals"]["write"].should == 3
       end
     end
   end
@@ -190,6 +190,39 @@ describe Daikon::Monitor, "#parse with values that have spaces" do
       summary["commands"].should   == {"SET" => 1}
       summary["keys"].should       == {"g:2470920:mrn" => 1}
       summary["namespaces"].should == {"g" => 1}
+    end
+  end
+end
+
+describe Daikon::Monitor, "#parse over several minutes keeps several minutes of data" do
+  before do
+    Timecop.freeze(Time.at(Time.now - 179)) do
+      parse("INCR foo")
+    end
+
+    Timecop.freeze(Time.at(Time.now - 119)) do
+      parse("DECR foo")
+    end
+
+    Timecop.freeze(Time.at(Time.now - 60)) do
+      parse("INCR foo")
+    end
+  end
+
+  it "separates each into a separate minute" do
+    Daikon::Monitor.pop do |summary|
+      summary["commands"].should   == {"INCR" => 1}
+      summary["keys"].should       == {"foo" => 1}
+    end
+
+    Daikon::Monitor.pop do |summary|
+      summary["commands"].should   == {"DECR" => 1}
+      summary["keys"].should       == {"foo" => 1}
+    end
+
+    Daikon::Monitor.pop do |summary|
+      summary["commands"].should   == {"INCR" => 1}
+      summary["keys"].should       == {"foo" => 1}
     end
   end
 end

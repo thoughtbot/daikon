@@ -13,7 +13,7 @@ module Daikon
       self.config  = config
       self.logger  = logger
       self.redis   = connect
-      self.monitor = Monitor.new(connect, logger)
+      self.monitor = Monitor.new
       self.http    = Excon.new(config.server_prefix)
 
       log "Started Daikon v#{VERSION}"
@@ -24,7 +24,7 @@ module Daikon
     end
 
     def start_monitor
-      monitor.start
+      Monitor.start
     end
 
     def log(message)
