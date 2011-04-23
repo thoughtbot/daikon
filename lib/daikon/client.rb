@@ -22,7 +22,7 @@ module Daikon
     end
 
     def start_monitor
-      Monitor.start
+      Monitor.start(connect)
     end
 
     def log(message)
@@ -40,13 +40,19 @@ module Daikon
       url = "#{config.server_prefix}#{path}"
       options[:head] ||= {}
       options[:head]['Authorization'] = config.api_key
+      options[:ssl] = {:verify_peer => true}
 
-      log "#{method} #{options[:url]}"
+      log "#{method.to_s.upcase} #{url}"
 
-      EventMachine.run_block do
+      EventMachine.run do
         http = EventMachine::HttpRequest.new(url).send(method, options)
         http.callback do
-          log "=> #{http.response}"
+          log "SUCCESS: #{http.response}"
+          EM.stop
+        end
+        http.errback do
+          log "ERROR: #{http.response}"
+          EM.stop
         end
       end
     end
