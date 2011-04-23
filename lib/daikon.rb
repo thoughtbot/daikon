@@ -7,7 +7,7 @@ require 'socket'
 require 'stringio'
 require 'thread'
 
-require 'excon'
+require 'em-http-request'
 require 'daemons'
 require 'json'
 require 'redis'

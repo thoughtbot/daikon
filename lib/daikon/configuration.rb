@@ -1,9 +1,10 @@
 module Daikon
   class Configuration
     BLANK_KEY = "1234567890"
+    URL       = "https://radish.heroku.com"
     FLAGS     = ["-u",                   "-k",      "-s"]
     OPTIONS   = ["redis_url",            "api_key", "server_prefix"]
-    DEFAULTS  = ["redis://0.0.0.0:6379", BLANK_KEY, "https://radish.heroku.com"]
+    DEFAULTS  = ["redis://0.0.0.0:6379", BLANK_KEY, URL]
 
     attr_accessor *OPTIONS
 

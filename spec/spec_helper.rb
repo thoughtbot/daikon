@@ -7,17 +7,22 @@ require 'daikon'
 # in ./support/ and its subdirectories.
 Dir["#{File.dirname(__FILE__)}/support/**/*.rb"].each {|f| require f}
 
-require 'timecop'
 require 'bourne'
+require 'timecop'
+require 'webmock/rspec'
 
 require 'support/capture_helper'
 require 'support/parse_helper'
+require 'support/url_helper'
+
+WebMock.disable_net_connect!
 
 RSpec.configure do |config|
   config.mock_with :mocha
 
   config.include CaptureHelper
   config.include ParseHelper
+  config.include UrlHelper
 
   config.before do
     Timecop.freeze(DateTime.now)

@@ -39,19 +39,16 @@ describe Daikon::Client, "setup" do
 end
 
 describe Daikon::Client, "when server is down" do
-  subject       { Daikon::Client.new }
-  let(:redis)   { stub("redis instance", :info => {}) }
+  subject     { Daikon::Client.new }
+  let(:redis) { stub("redis instance", :info => {}) }
 
   before do
     Redis.stubs(:connect => redis)
-    http = stub("http", :reset => nil)
-    http.stubs(:request).raises(Timeout::Error)
-    subject.stubs(:http => http)
-
+    stub_request(:any, infos_url).to_timeout
     subject.setup(Daikon::Configuration.new)
   end
 
-  it "does not commit suicide" do
+  it "does not kill the client" do
     lambda {
       subject.report_info
     }.should_not raise_error
@@ -59,14 +56,12 @@ describe Daikon::Client, "when server is down" do
 end
 
 describe Daikon::Client, "when it returns bad json" do
-  subject       { Daikon::Client.new }
-  let(:redis)   { stub("redis instance", :info => {}) }
+  subject     { Daikon::Client.new }
+  let(:redis) { stub("redis instance", :info => {}) }
 
   before do
     Redis.stubs(:connect => redis)
-    http = stub("http", :request => Excon::Response.new(:body => "{'bad':'json}"), :reset => nil)
-    subject.stubs(:http => http)
-
+    stub_request(:post, infos_url).to_return(:body => "{'bad':'json}")
     subject.setup(Daikon::Configuration.new)
   end
 
@@ -85,20 +80,15 @@ shared_examples_for "a summary api consumer" do
       "Content-Type"   => "application/json"
     }
 
-    http.should have_received(:reset)
-    http.should have_received(:request).with(
-      :method  => "POST",
-      :path    => "/api/v1/summaries.json",
-      :body    => payload.to_json,
-      :headers => headers)
+    WebMock.should have_requested(:post, summaries_url(server)).
+      with(:body => payload.to_json, :headers => headers)
   end
 end
 
 describe Daikon::Client, "rotate monitor" do
-  subject     { Daikon::Client.new }
-  let(:http)  { stub("http", :request => Excon::Response.new, :reset => nil) }
-  let(:now)   { "2011-01-19T18:23:55-05:00" }
-  let(:past)  { "2011-01-19T18:23:54-05:00" }
+  subject    { Daikon::Client.new }
+  let(:now)  { "2011-01-19T18:23:55-05:00" }
+  let(:past) { "2011-01-19T18:23:54-05:00" }
   let(:payload) do
     data.merge("start" => past, "stop" => now)
   end
@@ -110,9 +100,9 @@ describe Daikon::Client, "rotate monitor" do
   end
 
   before do
-    Daikon::Monitor.stubs(:pop).yields(data)
     Timecop.freeze DateTime.parse(now)
-    subject.stubs(:http => http)
+    Daikon::Monitor.stubs(:pop).yields(data)
+    stub_request(:post, summaries_url(server)).to_return(:status => 200)
     subject.setup(config)
     subject.rotate_monitor(DateTime.parse(past), DateTime.parse(now))
   end
@@ -146,12 +136,8 @@ shared_examples_for "a info api consumer" do
       "Content-Type"   => "application/json"
     }
 
-    http.should have_received(:reset)
-    http.should have_received(:request).with(
-      :method  => "POST",
-      :path    => "/api/v1/infos.json",
-      :body    => results.to_json,
-      :headers => headers)
+    WebMock.should have_requested(:post, infos_url(server)).
+      with(:body => results.to_json, :headers => headers)
   end
 end
 
@@ -159,10 +145,10 @@ describe Daikon::Client, "report info" do
   subject       { Daikon::Client.new }
   let(:results) { {"connected_clients"=>"1", "used_cpu_sys_childrens"=>"0.00"} }
   let(:redis)   { stub("redis instance", :info => results) }
-  let(:http)    { stub("http", :request => Excon::Response.new, :reset => nil) }
 
   before do
-    subject.stubs(:redis => redis, :http => http)
+    subject.stubs(:redis => redis)
+    stub_request(:post, infos_url(server)).to_return(:status => 200)
     subject.setup(config)
     subject.report_info
   end

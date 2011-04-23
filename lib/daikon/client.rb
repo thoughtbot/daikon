@@ -4,17 +4,15 @@ module Daikon
                   Errno::EINVAL,
                   Errno::ECONNRESET,
                   EOFError,
-                  JSON::ParserError,
-                  Excon::Errors::SocketError]
+                  JSON::ParserError]
 
-    attr_accessor :redis, :logger, :config, :http, :monitor
+    attr_accessor :redis, :logger, :config, :monitor
 
     def setup(config, logger = nil)
       self.config  = config
       self.logger  = logger
       self.redis   = connect
       self.monitor = Monitor.new
-      self.http    = Excon.new(config.server_prefix)
 
       log "Started Daikon v#{VERSION}"
     end
@@ -39,22 +37,26 @@ module Daikon
     end
 
     def request(method, path, options = {})
-      options[:method]  = method.to_s.upcase
-      options[:path]    = path
-      options[:headers] ||= {}
-      options[:headers]['Authorization'] = config.api_key
+      url = "#{config.server_prefix}#{path}"
+      options[:head] ||= {}
+      options[:head]['Authorization'] = config.api_key
 
-      log "#{options[:method]} #{config.server_prefix}#{options[:path]}"
-      http.reset
-      http.request(options)
+      log "#{method} #{options[:url]}"
+
+      EventMachine.run_block do
+        http = EventMachine::HttpRequest.new(url).send(method, options)
+        http.callback do
+          log "=> #{http.response}"
+        end
+      end
     end
 
     def push(method, path, body)
       json = body.to_json
       request(method, path,
-                   :body    => json,
-                   :headers => {"Content-Length" => json.size.to_s,
-                                "Content-Type"   => "application/json"})
+                   :body => json,
+                   :head => {"Content-Length" => json.size.to_s,
+                             "Content-Type"   => "application/json"})
     end
 
     def rotate_monitor(start, stop)
