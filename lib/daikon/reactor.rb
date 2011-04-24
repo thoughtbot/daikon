@@ -1,22 +1,14 @@
 module Daikon
   class Reactor
-    attr_reader :current_time, :info_collector
+    attr_reader :current_time
     attr_writer :callback, :info_interval
 
     def initialize(client = nil)
       @client = client
     end
 
-    def info_interval
-      @info_interval ||= 10
-    end
-
-    def info_collector
-      @info_collector ||= connect
-    end
-
     def start
-      EventMachine.add_periodic_timer(@info_interval) do
+      EventMachine.add_periodic_timer(info_interval) do
         @current_time = Time.now
         collect_info
         callback
@@ -40,6 +32,14 @@ module Daikon
 
     def connect
       @client.connect
+    end
+
+    def info_collector
+      @info_collector ||= connect
+    end
+
+    def info_interval
+      @info_interval ||= 10
     end
   end
 end
