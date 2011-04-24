@@ -1,17 +1,21 @@
+PATH
+  remote: ../em-hiredis
+  specs:
+    em-hiredis (0.0.1)
+      hiredis (~> 0.3.0)
+
+PATH
+  remote: ../em-spec
+  specs:
+    em-spec (0.2.2)
+
 GEM
   remote: http://rubygems.org/
   specs:
     addressable (2.2.4)
     bourne (1.0)
       mocha (= 0.9.8)
-    builder (2.1.2)
     crack (0.1.8)
-    cucumber (0.9.4)
-      builder (~> 2.1.2)
-      diff-lcs (~> 1.1.2)
-      gherkin (~> 2.2.9)
-      json (~> 1.4.6)
-      term-ansicolor (~> 1.0.5)
     daemons (1.1.0)
     diff-lcs (1.1.2)
     em-http-request (0.3.0)
@@ -20,15 +24,12 @@ GEM
       eventmachine (>= 0.12.9)
     escape_utils (0.2.3)
     eventmachine (0.12.10)
-    gherkin (2.2.9)
-      json (~> 1.4.6)
-      term-ansicolor (~> 1.0.5)
     git (1.2.5)
+    hiredis (0.3.1)
     jeweler (1.5.1)
       bundler (~> 1.0.0)
       git (>= 1.2.5)
       rake
-    json (1.4.6)
     json_pure (1.4.6)
     mocha (0.9.8)
       rake
@@ -42,7 +43,6 @@ GEM
     rspec-expectations (2.1.0)
       diff-lcs (~> 1.1.2)
     rspec-mocks (2.1.0)
-    term-ansicolor (1.0.5)
     timecop (0.3.5)
     webmock (1.6.1)
       addressable (>= 2.2.2)
@@ -53,9 +53,10 @@ PLATFORMS
 
 DEPENDENCIES
   bourne
-  cucumber
   daemons (= 1.1.0)
+  em-hiredis!
   em-http-request (= 0.3.0)
+  em-spec!
   jeweler
   json_pure (= 1.4.6)
   redis (= 2.1.1)

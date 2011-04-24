@@ -8,6 +8,7 @@ require 'daikon'
 Dir["#{File.dirname(__FILE__)}/support/**/*.rb"].each {|f| require f}
 
 require 'bourne'
+require 'em-spec/rspec'
 require 'timecop'
 require 'webmock/rspec'
 
@@ -21,11 +22,12 @@ RSpec.configure do |config|
   config.mock_with :mocha
 
   config.include CaptureHelper
+  config.include EventMachine::SpecHelper
   config.include ParseHelper
+  config.include RedisMock::Helper
   config.include UrlHelper
 
   config.before do
-    Timecop.freeze(DateTime.now)
     Daikon::Monitor.reset
   end
 

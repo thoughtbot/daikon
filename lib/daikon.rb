@@ -7,6 +7,7 @@ require 'socket'
 require 'stringio'
 require 'thread'
 
+require 'em-hiredis'
 require 'em-http-request'
 require 'daemons'
 require 'json'
@@ -20,6 +21,7 @@ $LOAD_PATH.unshift __DIR__ unless
 
 require 'daikon/configuration'
 require 'daikon/client'
+require 'daikon/reactor'
 require 'daikon/daemon'
 require 'daikon/monitor'
 

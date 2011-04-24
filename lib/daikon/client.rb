@@ -6,23 +6,17 @@ module Daikon
                   EOFError,
                   JSON::ParserError]
 
-    attr_accessor :redis, :logger, :config, :monitor
+    attr_accessor :redis, :logger, :config
 
-    def setup(config, logger = nil)
+    def initialize(config = Daikon::Configuration.new, logger = nil)
       self.config  = config
       self.logger  = logger
-      self.redis   = connect
-      self.monitor = Monitor.new
 
       log "Started Daikon v#{VERSION}"
     end
 
     def connect
-      Redis.connect(:url => config.redis_url)
-    end
-
-    def start_monitor
-      Monitor.start(connect)
+      EventMachine::Hiredis.connect(config.redis_url)
     end
 
     def log(message)
@@ -76,8 +70,8 @@ module Daikon
       exception(ex)
     end
 
-    def report_info
-       push :post, "/api/v1/infos.json", redis.info
+    def report_info(info)
+       push :post, "/api/v1/infos.json", info
     rescue *EXCEPTIONS => ex
       exception(ex)
     end
