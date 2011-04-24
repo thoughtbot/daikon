@@ -11,7 +11,7 @@ describe Daikon::Reactor, "start" do
 
   it "collects info once per interval" do
     now = Time.now
-    subject.callback = lambda { |reactor| reactor.current_time.to_f >= now.to_f + 1.1 }
+    subject.stopper = lambda { |reactor| reactor.current_time.to_f >= now.to_f + 1.1 }
 
     em do
       subject.start
@@ -37,7 +37,7 @@ describe Daikon::Reactor, "collecting info" do
     redis_mock(replies) do
       em do
         subject.collect_info
-        subject.callback = lambda do |reactor|
+        subject.stopper = lambda do |reactor|
           client.should have_received(:report_info).with(:total_commands_processed => "1")
         end
       end

@@ -1,27 +1,7 @@
 module Daikon
   class Daemon
-    INFO_INTERVAL    = ENV["INFO_INTERVAL"] || 10
-    SUMMARY_INTERVAL = ENV["SUMMARY_INTERVAL"] || 60
-
-    def self.sleep_time=(sleep_time)
-      @@sleep_time = sleep_time
-    end
-
-    def self.sleep_time
-      @@sleep_time ||= 1
-    end
-
-    def self.run=(run)
-      @@run = run
-    end
-
-    def self.run
-      @@run
-    end
-
     def self.start(argv, ontop = false)
-      self.run = true
-      config = Daikon::Configuration.new(argv)
+      config = Configuration.new(argv)
 
       if argv.include?("-v") || argv.include?("--version")
         puts "Daikon v#{VERSION}"
@@ -35,27 +15,11 @@ module Daikon
           logger = Logger.new("/tmp/radish.log")
         end
 
-        rotated_at  = Time.now
-        reported_at = Time.now
-        client      = Daikon::Client.new
+        client  = Client.new(config, logger)
+        reactor = Reactor.new(client)
 
-        client.setup(config, logger)
-        client.start_monitor
-
-        while self.run do
-          now = Time.now
-
-          if now - reported_at >= sleep_time * INFO_INTERVAL.to_i
-            client.report_info
-            reported_at = now
-          end
-
-          if now - rotated_at >= sleep_time * SUMMARY_INTERVAL.to_i
-            client.rotate_monitor(rotated_at, now)
-            rotated_at = now
-          end
-
-          sleep sleep_time
+        EventMachine.run do
+          reactor.start
         end
       end
     end

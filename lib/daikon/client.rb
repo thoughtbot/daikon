@@ -1,5 +1,7 @@
 module Daikon
   class Client
+    include Stopper
+
     EXCEPTIONS = [Timeout::Error,
                   Errno::EINVAL,
                   Errno::ECONNRESET,
@@ -38,16 +40,14 @@ module Daikon
 
       log "#{method.to_s.upcase} #{url}"
 
-      EventMachine.run do
-        http = EventMachine::HttpRequest.new(url).send(method, options)
-        http.callback do
-          log "SUCCESS: #{http.response}"
-          EM.stop
-        end
-        http.errback do
-          log "ERROR: #{http.response}"
-          EM.stop
-        end
+      http = EventMachine::HttpRequest.new(url).send(method, options)
+      http.callback do
+        log "SUCCESS: #{http.response}"
+        stopper
+      end
+      http.errback do
+        log "ERROR: #{http.response}"
+        stopper
       end
     end
 

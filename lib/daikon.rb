@@ -20,6 +20,7 @@ $LOAD_PATH.unshift __DIR__ unless
   $LOAD_PATH.include?(File.expand_path(__DIR__))
 
 require 'daikon/configuration'
+require 'daikon/stopper'
 require 'daikon/client'
 require 'daikon/reactor'
 require 'daikon/daemon'
@@ -28,5 +29,5 @@ require 'daikon/monitor'
 require 'daikon/daemons_hacks'
 
 module Daikon
-  VERSION = "0.8.3"
+  VERSION = "0.9.0"
 end

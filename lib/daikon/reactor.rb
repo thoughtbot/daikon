@@ -1,7 +1,9 @@
 module Daikon
   class Reactor
+    include Stopper
+
     attr_reader :current_time
-    attr_writer :callback, :info_interval
+    attr_writer :info_interval
 
     def initialize(client = nil)
       @client = client
@@ -11,22 +13,14 @@ module Daikon
       EventMachine.add_periodic_timer(info_interval) do
         @current_time = Time.now
         collect_info
-        callback
+        stopper
       end
     end
 
     def collect_info
       info_collector.info do |info|
         @client.report_info(info)
-        callback
-      end
-    end
-
-    private
-
-    def callback
-      if @callback && @callback.call(self)
-        EventMachine.stop
+        stopper
       end
     end
 
