@@ -53,10 +53,9 @@ module Daikon
     end
 
     def self.start(redis)
-      Thread.new do
-        redis.monitor do |line|
-          parse(line)
-        end
+      redis.monitor
+      redis.on(:monitor) do |line|
+        parse(line)
       end
     end
 

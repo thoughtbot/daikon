@@ -20,7 +20,7 @@ $LOAD_PATH.unshift __DIR__ unless
   $LOAD_PATH.include?(File.expand_path(__DIR__))
 
 require 'daikon/configuration'
-require 'daikon/stopper'
+require 'daikon/bus'
 require 'daikon/client'
 require 'daikon/reactor'
 require 'daikon/daemon'

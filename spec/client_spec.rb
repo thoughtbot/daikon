@@ -30,12 +30,12 @@ describe Daikon::Client, "when server is down" do
   subject { Daikon::Client.new }
 
   before do
-    subject.stopper = lambda { |client| EventMachine.stop }
     stub_request(:any, infos_url).to_timeout
   end
 
   it "does not kill the client" do
     em do
+      subject.on(:request_error) { EM.stop }
       lambda {
         subject.report_info({})
       }.should_not raise_error
@@ -47,12 +47,12 @@ describe Daikon::Client, "when it returns bad json" do
   subject { Daikon::Client.new }
 
   before do
-    subject.stopper = lambda { |client| EventMachine.stop }
     stub_request(:post, infos_url).to_return(:body => "{'bad':'json}")
   end
 
   it "does not commit suicide" do
     em do
+      subject.on(:request_success) { EM.stop }
       lambda {
         subject.report_info({})
       }.should_not raise_error
@@ -94,7 +94,7 @@ describe Daikon::Client, "rotate monitor" do
   before do
     Timecop.freeze DateTime.parse(now)
     Daikon::Monitor.stubs(:pop).yields(data)
-    subject.stopper = lambda { |client| EventMachine.stop }
+    subject.on(:request_success) { EM.stop }
     stub_request(:post, summaries_url(server)).to_return(:status => 200)
   end
 
@@ -141,7 +141,7 @@ describe Daikon::Client, "report info" do
   let(:info) { {"connected_clients"=>"1", "used_cpu_sys_childrens"=>"0.00"} }
 
   before do
-    subject.stopper = lambda { |client| EventMachine.stop }
+    subject.on(:request_success) { EM.stop }
     stub_request(:post, infos_url(server)).to_return(:status => 200)
   end
 

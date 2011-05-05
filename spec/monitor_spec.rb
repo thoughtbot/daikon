@@ -226,3 +226,23 @@ describe Daikon::Monitor, "#parse over several minutes keeps several minutes of 
     end
   end
 end
+
+describe Daikon::Monitor, ".start" do
+  let(:redis) { stub('redis', :monitor => true) }
+  before do
+    redis.stubs(:on).with(:monitor).yields("INCR foo")
+  end
+  it "should subscribe to monitor" do
+    Daikon::Monitor.start(redis)
+    redis.should have_received(:monitor)
+    redis.should have_received(:on).with(:monitor)
+  end
+
+  it "should parse subscription data" do
+    Daikon::Monitor.start(redis)
+    Daikon::Monitor.pop do |summary|
+      summary["commands"].should == {"INCR" => 1}
+      summary["keys"].should == {"foo" => 1 }
+    end
+  end
+end

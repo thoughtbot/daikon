@@ -1,23 +1,20 @@
-PATH
-  remote: ../em-hiredis
-  specs:
-    em-hiredis (0.0.1)
-      hiredis (~> 0.3.0)
-
-PATH
-  remote: ../em-spec
+GIT
+  remote: https://github.com/bcg/em-spec.git
+  revision: e44d67847794d317078cf357271863447d26c8c5
   specs:
     em-spec (0.2.2)
 
 GEM
   remote: http://rubygems.org/
   specs:
-    addressable (2.2.4)
+    addressable (2.2.5)
     bourne (1.0)
       mocha (= 0.9.8)
     crack (0.1.8)
     daemons (1.1.0)
     diff-lcs (1.1.2)
+    em-hiredis (0.1.0)
+      hiredis (~> 0.3.0)
     em-http-request (0.3.0)
       addressable (>= 2.0.0)
       escape_utils
@@ -35,16 +32,16 @@ GEM
       rake
     rake (0.8.7)
     redis (2.1.1)
-    rspec (2.1.0)
-      rspec-core (~> 2.1.0)
-      rspec-expectations (~> 2.1.0)
-      rspec-mocks (~> 2.1.0)
-    rspec-core (2.1.0)
-    rspec-expectations (2.1.0)
+    rspec (2.5.0)
+      rspec-core (~> 2.5.0)
+      rspec-expectations (~> 2.5.0)
+      rspec-mocks (~> 2.5.0)
+    rspec-core (2.5.1)
+    rspec-expectations (2.5.0)
       diff-lcs (~> 1.1.2)
-    rspec-mocks (2.1.0)
+    rspec-mocks (2.5.0)
     timecop (0.3.5)
-    webmock (1.6.1)
+    webmock (1.6.2)
       addressable (>= 2.2.2)
       crack (>= 0.1.7)
 
@@ -54,7 +51,7 @@ PLATFORMS
 DEPENDENCIES
   bourne
   daemons (= 1.1.0)
-  em-hiredis!
+  em-hiredis (= 0.1.0)
   em-http-request (= 0.3.0)
   em-spec!
   jeweler
