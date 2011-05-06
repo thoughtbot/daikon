@@ -13,4 +13,5 @@ group :development do
   gem "rspec"
   gem "timecop"
   gem "webmock"
+  gem "SystemTimer", :platform => :mri_18
 end

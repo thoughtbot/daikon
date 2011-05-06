@@ -17,7 +17,7 @@ describe Daikon::Reactor, "start" do
     times = []
     subject.on(:start_info) do
       times << Time.now
-      if times.count == 2
+      if times.length == 2
         EM.stop
         (times[1] - times[0]).should be_within(0.1).of(subject.info_interval)
       end
@@ -32,7 +32,7 @@ describe Daikon::Reactor, "start" do
     times = []
     subject.on(:start_summary) do
       times << Time.now
-      if times.count == 2
+      if times.length == 2
         EM.stop
         (times[1] - times[0]).should be_within(0.1).of(subject.summary_interval)
       end

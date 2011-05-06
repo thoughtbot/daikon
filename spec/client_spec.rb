@@ -73,7 +73,7 @@ shared_examples_for "a summary api consumer" do
     end
 
     WebMock.should have_requested(:post, summaries_url(server)).
-      with(:body => payload.to_json, :headers => headers)
+      with(:headers => headers) { |req| JSON.parse!(req.body) == payload }
   end
 end
 

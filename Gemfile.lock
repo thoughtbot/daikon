@@ -7,6 +7,7 @@ GIT
 GEM
   remote: http://rubygems.org/
   specs:
+    SystemTimer (1.2)
     addressable (2.2.5)
     bourne (1.0)
       mocha (= 0.9.8)
@@ -49,6 +50,7 @@ PLATFORMS
   ruby
 
 DEPENDENCIES
+  SystemTimer
   bourne
   daemons (= 1.1.0)
   em-hiredis (= 0.1.0)

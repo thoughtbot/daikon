@@ -19,12 +19,13 @@ module Daikon
     end
 
     def self.pop
-      time, summary = self.summaries.first
+      time = self.summaries.keys.sort.first
+      summary = self.summaries[time]
       if summary.nil?
         summary = summary_hash
       end
       summary["start"] = summary["stop"] = Time.now
-      summary["keys"] = Hash[*summary["keys"].sort_by(&:last).reverse[0..99].flatten]
+      summary["keys"] = Hash[*summary["keys"].sort_by{|a| a.last}.reverse[0..99].flatten]
       yield(summary)
       summaries.delete(time) if time
     end
