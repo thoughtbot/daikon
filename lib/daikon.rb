@@ -29,5 +29,5 @@ require 'daikon/monitor'
 require 'daikon/daemons_hacks'
 
 module Daikon
-  VERSION = "0.9.0"
+  VERSION = "0.9.1"
 end
