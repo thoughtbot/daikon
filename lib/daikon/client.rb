@@ -36,9 +36,9 @@ module Daikon
       url = "#{config.server_prefix}#{path}"
       options[:head] ||= {}
       options[:head]['Authorization'] = config.api_key
-      options[:ssl] = {:verify_peer => true}
+      options[:ssl] = {:verify_peer => true, :cert_chain_file => Daikon.data_dir("heroku.crt")}
 
-      log "#{method.to_s.upcase} #{url}"
+      log "#{method.to_s.upcase} #{url} with ssl cert #{options[:ssl][:cert_chain_file]}"
 
       http = EventMachine::HttpRequest.new(url).send(method, options)
       http.callback do
