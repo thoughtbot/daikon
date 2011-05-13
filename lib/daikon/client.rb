@@ -36,7 +36,7 @@ module Daikon
       url = "#{config.server_prefix}#{path}"
       options[:head] ||= {}
       options[:head]['Authorization'] = config.api_key
-      options[:ssl] = {:verify_peer => true, :cert_chain_file => Daikon.data_dir("heroku.crt")}
+      options[:ssl] = {:verify_peer => true}
 
       log "#{method.to_s.upcase} #{url}"
 

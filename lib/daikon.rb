@@ -29,13 +29,5 @@ require 'daikon/monitor'
 require 'daikon/daemons_hacks'
 
 module Daikon
-  VERSION = "0.9.2"
-
-  def self.data_dir(path)
-    if datadir = Gem.datadir("daikon")
-      File.join(datadir, path)
-    else
-      ""
-    end
-  end
+  VERSION = "0.9.3"
 end

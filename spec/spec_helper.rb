@@ -10,13 +10,12 @@ Dir["#{File.dirname(__FILE__)}/support/**/*.rb"].each {|f| require f}
 require 'bourne'
 require 'em-spec/rspec'
 require 'timecop'
-require 'webmock/rspec'
 
 require 'support/capture_helper'
 require 'support/parse_helper'
 require 'support/url_helper'
+require 'support/radish_helper'
 
-WebMock.disable_net_connect!
 
 RSpec.configure do |config|
   config.mock_with :mocha
@@ -26,6 +25,7 @@ RSpec.configure do |config|
   config.include ParseHelper
   config.include RedisMock::Helper
   config.include UrlHelper
+  config.include FakeRadish::Matchers
 
   config.before do
     Daikon::Monitor.reset
