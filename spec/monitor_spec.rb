@@ -161,7 +161,18 @@ describe Daikon::Monitor, "#rotate that collects namespaces" do
   end
 end
 
+describe Daikon::Monitor, "#parse multiple database log" do
+  it "parses the data correctly" do
+    subject.parse('1304626114.869421 (db 2) "rpop" "shoppinshoppinshoppinshoppinshoppingggggshopping"')
+
+    data = subject.rotate
+    data["commands"].should == {"RPOP" => 1}
+    data["keys"].should     == {"shoppinshoppinshoppinshoppinshoppingggggshopping" => 1}
+  end
+end
+
 describe Daikon::Monitor, "#rotate with values that have spaces" do
+  let(:redis) { stub('redis', :monitor => true) }
   before do
     subject.parse("set g:2470920:mrn 11")
     subject.parse("Email Error")

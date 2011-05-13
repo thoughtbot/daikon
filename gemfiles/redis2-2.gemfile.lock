@@ -1,7 +1,7 @@
 GEM
   remote: http://rubygems.org/
   specs:
-    appraisal (0.3.4)
+    appraisal (0.3.5)
       aruba (~> 0.3.6)
       bundler
       rake
@@ -23,8 +23,7 @@ GEM
     daemons (1.1.2)
     diff-lcs (1.1.2)
     excon (0.5.6)
-    ffi (1.0.7)
-      rake (>= 0.8.7)
+    ffi (1.0.9)
     gherkin (2.3.10)
       json (>= 1.4.6)
     json (1.5.1)
@@ -48,7 +47,7 @@ PLATFORMS
   ruby
 
 DEPENDENCIES
-  appraisal
+  appraisal (~> 0.3.5)
   bourne
   cucumber
   daemons (~> 1.1.0)
