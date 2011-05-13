@@ -227,6 +227,17 @@ describe Daikon::Monitor, "#parse over several minutes keeps several minutes of 
   end
 end
 
+describe Daikon::Monitor, "#parse multiple database log" do
+  it "parses the data correctly" do
+    parse('1304626114.869421 (db 2) "rpop" "shoppinshoppinshoppinshoppinshoppingggggshopping"')
+
+    Daikon::Monitor.pop do |summary|
+      summary["commands"].should     == {"RPOP" => 1}
+      summary["keys"].should         == {"shoppinshoppinshoppinshoppinshoppingggggshopping" => 1}
+    end
+  end
+end
+
 describe Daikon::Monitor, ".start" do
   let(:redis) { stub('redis', :monitor => true) }
   before do
