@@ -59,8 +59,7 @@ module Daikon
 
     def rotate_monitor(start, stop)
       payload = monitor.rotate.merge({
-        "start" => start,
-        "stop"  => stop
+        "created_at" => stop
       })
 
       push :post, "/api/v1/summaries.json", payload
