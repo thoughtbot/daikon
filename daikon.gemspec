@@ -5,12 +5,11 @@ Gem::Specification.new do |s|
   s.version = Daikon::VERSION
 
   s.required_rubygems_version = Gem::Requirement.new(">= 0") if s.respond_to? :required_rubygems_version=
-  s.authors = ["Nick Quaranto"]
-  s.date = %q{2011-03-25}
-  s.default_executable = %q{daikon}
+  s.authors = [%q{Nick Quaranto}]
+  s.date = %q{2011-05-30}
   s.description = %q{daikon, a radishapp.com client}
   s.email = %q{nick@quaran.to}
-  s.executables = ["daikon"]
+  s.executables = [%q{daikon}]
   s.extra_rdoc_files = [
     "README.rdoc"
   ]
@@ -31,6 +30,7 @@ Gem::Specification.new do |s|
     "lib/daikon/daemons_hacks.rb",
     "lib/daikon/monitor.rb",
     "lib/daikon/redis_hacks.rb",
+    "lib/daikon/version.rb",
     "spec/client_spec.rb",
     "spec/configuration_spec.rb",
     "spec/daemon_spec.rb",
@@ -38,10 +38,10 @@ Gem::Specification.new do |s|
     "spec/spec_helper.rb"
   ]
   s.homepage = %q{http://github.com/qrush/daikon}
-  s.licenses = ["MIT"]
-  s.require_paths = ["lib"]
+  s.licenses = [%q{MIT}]
+  s.require_paths = [%q{lib}]
   s.required_ruby_version = Gem::Requirement.new(">= 1.8.7")
-  s.rubygems_version = %q{1.6.2}
+  s.rubygems_version = %q{1.8.1}
   s.summary = %q{daikon, a radishapp.com client}
   s.test_files = [
     "spec/client_spec.rb",
