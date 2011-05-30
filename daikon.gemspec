@@ -1,4 +1,4 @@
-require './lib/daikon'
+require './lib/daikon/version'
 
 Gem::Specification.new do |s|
   s.name = %q{daikon}
