@@ -44,7 +44,6 @@ module Daikon
       options[:headers] ||= {}
       options[:headers]['Authorization'] = config.api_key
 
-      log "#{options[:method]} #{config.server_prefix}#{options[:path]}"
       http.reset
       http.request(options)
     end
@@ -64,12 +63,14 @@ module Daikon
 
       push :post, "/api/v1/summaries.json", payload
     rescue *EXCEPTIONS => ex
+      log "Error when rotating monitor"
       exception(ex)
     end
 
     def report_info
        push :post, "/api/v1/infos.json", redis.info
     rescue *EXCEPTIONS => ex
+      log "Error when reporting info"
       exception(ex)
     end
   end
