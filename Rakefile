@@ -1,3 +1,5 @@
+require 'appraisal'
+
 require 'rspec/core'
 require 'rspec/core/rake_task'
 RSpec::Core::RakeTask.new(:spec) do |spec|
@@ -7,6 +9,11 @@ end
 
 desc "run tests"
 task :default => :spec
+
+desc "test all appraisals"
+task :all do
+  sh("bundle exec rake appraisal:redis2-1") && sh("bundle exec rake appraisal:redis2-2")
+end
 
 def parse_monitor
   monitor = Daikon::Monitor.new(nil, nil)
