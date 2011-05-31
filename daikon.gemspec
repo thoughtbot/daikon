@@ -16,27 +16,15 @@ Gem::Specification.new do |s|
   s.files = [
     ".document",
     ".rspec",
+    "Appraisals",
     "Gemfile",
     "Gemfile.lock",
     "MIT-LICENSE",
     "README.rdoc",
     "Rakefile",
     "bin/daikon",
-    "daikon.gemspec",
-    "lib/daikon.rb",
-    "lib/daikon/client.rb",
-    "lib/daikon/configuration.rb",
-    "lib/daikon/daemon.rb",
-    "lib/daikon/daemons_hacks.rb",
-    "lib/daikon/monitor.rb",
-    "lib/daikon/redis_hacks.rb",
-    "lib/daikon/version.rb",
-    "spec/client_spec.rb",
-    "spec/configuration_spec.rb",
-    "spec/daemon_spec.rb",
-    "spec/monitor_spec.rb",
-    "spec/spec_helper.rb"
-  ]
+    "daikon.gemspec"
+  ] + Dir["lib/**/*.rb"] + Dir["spec/*.rb"] + Dir["gemfiles/*"]
   s.homepage = %q{http://github.com/qrush/daikon}
   s.licenses = [%q{MIT}]
   s.require_paths = [%q{lib}]
