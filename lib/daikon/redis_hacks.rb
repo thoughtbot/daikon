@@ -33,11 +33,21 @@ class Redis
     end
   end
 
-  class Connection
+  module ConnectionHacks
     def read_with_old_protocol
       reply_type = @sock.gets
       raise Errno::ECONNRESET unless reply_type
       reply_type
+    end
+  end
+
+  if VERSION < "2.1.0"
+    class Connection
+      include ConnectionHacks
+    end
+  else
+    class Connection::Ruby
+      include ConnectionHacks
     end
   end
 end
