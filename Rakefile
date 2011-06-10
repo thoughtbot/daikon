@@ -14,7 +14,9 @@ desc "test all appraisals"
 task :all do
   sh("bundle exec rake appraisal:install") &&
   sh("bundle exec rake appraisal:redis2-1") &&
-  sh("bundle exec rake appraisal:redis2-2")
+  sh("bundle exec rake appraisal:redis2-2") &&
+  sh("bundle exec rake appraisal:excon0-5") &&
+  sh("bundle exec rake appraisal:excon0-6")
 end
 
 def parse_monitor

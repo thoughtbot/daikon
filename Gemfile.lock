@@ -51,7 +51,7 @@ DEPENDENCIES
   bourne
   cucumber
   daemons (~> 1.1.0)
-  excon (~> 0.5.6)
+  excon (~> 0.5)
   json_pure (~> 1.4.6)
   redis (~> 2.2)
   rspec
