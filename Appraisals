@@ -13,3 +13,11 @@ end
 appraise "excon0-6" do
   gem "excon", "~> 0.6.0"
 end
+
+appraise "json1-4" do
+  gem "json", "~> 1.4"
+end
+
+appraise "json1-5" do
+  gem "json", "~> 1.5"
+end

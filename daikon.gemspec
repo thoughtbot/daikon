@@ -45,7 +45,7 @@ Gem::Specification.new do |s|
     if Gem::Version.new(Gem::VERSION) >= Gem::Version.new('1.2.0') then
       s.add_runtime_dependency(%q<daemons>, ["~> 1.1.0"])
       s.add_runtime_dependency(%q<excon>, ["~> 0.5"])
-      s.add_runtime_dependency(%q<json_pure>, ["~> 1.4.6"])
+      s.add_runtime_dependency(%q<json_pure>, ["~> 1.4"])
       s.add_runtime_dependency(%q<redis>, ["~> 2.1"])
       s.add_development_dependency(%q<bourne>, [">= 0"])
       s.add_development_dependency(%q<cucumber>, [">= 0"])
@@ -54,8 +54,8 @@ Gem::Specification.new do |s|
       s.add_development_dependency(%q<timecop>, [">= 0"])
     else
       s.add_dependency(%q<daemons>, ["= 1.1.0"])
-      s.add_dependency(%q<excon>, ["= 0.5.6"])
-      s.add_dependency(%q<json_pure>, ["= 1.4.6"])
+      s.add_dependency(%q<excon>, ["~> 0.5"])
+      s.add_dependency(%q<json_pure>, ["~> 1.4"])
       s.add_dependency(%q<redis>, ["= 2.1.1"])
       s.add_dependency(%q<bourne>, [">= 0"])
       s.add_dependency(%q<cucumber>, [">= 0"])

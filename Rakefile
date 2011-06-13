@@ -16,7 +16,9 @@ task :all do
   sh("bundle exec rake appraisal:redis2-1") &&
   sh("bundle exec rake appraisal:redis2-2") &&
   sh("bundle exec rake appraisal:excon0-5") &&
-  sh("bundle exec rake appraisal:excon0-6")
+  sh("bundle exec rake appraisal:excon0-6") &&
+  sh("bundle exec rake appraisal:json1-4") &&
+  sh("bundle exec rake appraisal:json1-5")
 end
 
 def parse_monitor
