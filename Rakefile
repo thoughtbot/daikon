@@ -12,13 +12,16 @@ task :default => :spec
 
 desc "test all appraisals"
 task :all do
-  sh("bundle exec rake appraisal:install") &&
-  sh("bundle exec rake appraisal:redis2-1") &&
-  sh("bundle exec rake appraisal:redis2-2") &&
-  sh("bundle exec rake appraisal:excon0-5") &&
-  sh("bundle exec rake appraisal:excon0-6") &&
-  sh("bundle exec rake appraisal:json1-4") &&
-  sh("bundle exec rake appraisal:json1-5")
+  appraisals =
+    %w[redis2-1   redis2-2
+       excon0-5   excon0-6
+       json1-4    json1-5
+       daemons1-0 daemons1-1].map do |run|
+    "bundle exec rake appraisal:#{run}"
+  end
+
+  sh "bundle exec rake appraisal:install"
+  sh appraisals.join(' && ')
 end
 
 def parse_monitor

@@ -39,40 +39,13 @@ Gem::Specification.new do |s|
     "spec/spec_helper.rb"
   ]
 
-  if s.respond_to? :specification_version then
-    s.specification_version = 3
-
-    if Gem::Version.new(Gem::VERSION) >= Gem::Version.new('1.2.0') then
-      s.add_runtime_dependency(%q<daemons>, ["~> 1.1.0"])
-      s.add_runtime_dependency(%q<excon>, ["~> 0.5"])
-      s.add_runtime_dependency(%q<json_pure>, ["~> 1.4"])
-      s.add_runtime_dependency(%q<redis>, ["~> 2.1"])
-      s.add_development_dependency(%q<bourne>, [">= 0"])
-      s.add_development_dependency(%q<cucumber>, [">= 0"])
-      s.add_development_dependency(%q<jeweler>, [">= 0"])
-      s.add_development_dependency(%q<rspec>, [">= 0"])
-      s.add_development_dependency(%q<timecop>, [">= 0"])
-    else
-      s.add_dependency(%q<daemons>, ["= 1.1.0"])
-      s.add_dependency(%q<excon>, ["~> 0.5"])
-      s.add_dependency(%q<json_pure>, ["~> 1.4"])
-      s.add_dependency(%q<redis>, ["= 2.1.1"])
-      s.add_dependency(%q<bourne>, [">= 0"])
-      s.add_dependency(%q<cucumber>, [">= 0"])
-      s.add_dependency(%q<jeweler>, [">= 0"])
-      s.add_dependency(%q<rspec>, [">= 0"])
-      s.add_dependency(%q<timecop>, [">= 0"])
-    end
-  else
-    s.add_dependency(%q<daemons>, ["= 1.1.0"])
-    s.add_dependency(%q<excon>, ["= 0.5.6"])
-    s.add_dependency(%q<json_pure>, ["= 1.4.6"])
-    s.add_dependency(%q<redis>, ["= 2.1.1"])
-    s.add_dependency(%q<bourne>, [">= 0"])
-    s.add_dependency(%q<cucumber>, [">= 0"])
-    s.add_dependency(%q<jeweler>, [">= 0"])
-    s.add_dependency(%q<rspec>, [">= 0"])
-    s.add_dependency(%q<timecop>, [">= 0"])
-  end
+  s.add_runtime_dependency(%q<daemons>, ["~> 1.0"])
+  s.add_runtime_dependency(%q<excon>, ["~> 0.5"])
+  s.add_runtime_dependency(%q<json_pure>, ["~> 1.4"])
+  s.add_runtime_dependency(%q<redis>, ["~> 2.1"])
+  s.add_development_dependency(%q<bourne>, [">= 0"])
+  s.add_development_dependency(%q<cucumber>, [">= 0"])
+  s.add_development_dependency(%q<jeweler>, [">= 0"])
+  s.add_development_dependency(%q<rspec>, [">= 0"])
+  s.add_development_dependency(%q<timecop>, [">= 0"])
 end
-
