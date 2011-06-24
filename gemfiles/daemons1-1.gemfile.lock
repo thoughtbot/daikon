@@ -48,6 +48,7 @@ PLATFORMS
 
 DEPENDENCIES
   appraisal (~> 0.3.5)
+  aruba
   bourne
   cucumber
   daemons (~> 1.1.3)

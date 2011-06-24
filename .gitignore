@@ -11,3 +11,4 @@ doc
 *.txt
 *.gif
 *.profile*
+tmp/

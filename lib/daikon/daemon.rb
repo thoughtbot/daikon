@@ -35,9 +35,13 @@ module Daikon
           logger = Logger.new("/tmp/radish.log")
         end
 
-        rotated_at  = Time.now
-        reported_at = Time.now
-        client      = Daikon::Client.new
+        if port = ENV["PORT"]
+          logger.info "Port detected, starting server on port #{port}"
+          Daikon::Server.start(logger, port)
+        end
+
+        rotated_at = reported_at = Time.now
+        client = Daikon::Client.new
 
         client.setup(config, logger)
         client.start_monitor
