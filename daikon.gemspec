@@ -6,7 +6,7 @@ Gem::Specification.new do |s|
 
   s.required_rubygems_version = Gem::Requirement.new(">= 0") if s.respond_to? :required_rubygems_version=
   s.authors = ['Nick Quaranto', 'thoughtbot']
-  s.date = %q{2011-06-16}
+  s.date = %q{2011-06-24}
   s.description = %q{daikon, a radishapp.com client}
   s.email = %q{nick@thoughtbot.com}
   s.executables = [%q{daikon}]
@@ -24,20 +24,17 @@ Gem::Specification.new do |s|
     "Rakefile",
     "bin/daikon",
     "daikon.gemspec"
-  ] + Dir["lib/**/*.rb"] + Dir["spec/*.rb"] + Dir["gemfiles/*"]
+  ] + Dir["lib/**/*.rb"]
   s.homepage = %q{http://github.com/qrush/daikon}
   s.licenses = [%q{MIT}]
   s.require_paths = [%q{lib}]
   s.required_ruby_version = Gem::Requirement.new(">= 1.8.6")
   s.rubygems_version = %q{1.8.1}
   s.summary = %q{daikon, a radishapp.com client}
-  s.test_files = [
-    "spec/client_spec.rb",
-    "spec/configuration_spec.rb",
-    "spec/daemon_spec.rb",
-    "spec/monitor_spec.rb",
-    "spec/spec_helper.rb"
-  ]
+  s.test_files =
+    Dir["gemfiles/**/*"] +
+    Dir["spec/**/*"] +
+    Dir["features/**/*"]
 
   s.add_runtime_dependency(%q<daemons>, ["~> 1.0"])
   s.add_runtime_dependency(%q<excon>, ["~> 0.5"])
