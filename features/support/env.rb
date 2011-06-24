@@ -34,7 +34,7 @@ module KillHelpers
   def kill_daikon
     if File.exist?("daikon.pid")
       system "bundle exec ruby -Ilib ./bin/daikon stop"
-      system "kill -TERM $(pgrep -f daikon)"
+      system "kill -INT $(pgrep -f daikon)"
       FileUtils.rm_rf("*.pid")
     end
   end
