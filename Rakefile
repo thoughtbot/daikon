@@ -17,12 +17,16 @@ desc "test all appraisals"
 task :all do
   appraisals =
     %w[redis2-1   redis2-2
+       excon0-5   excon0-6
+       json1-4    json1-5
        daemons1-0 daemons1-1].map do |run|
     "bundle exec rake appraisal:#{run}"
   end
 
-  sh "bundle exec rake appraisal:install"
-  sh appraisals.join(' && ')
+  appraisals.each do |appraisal|
+    sh appraisal
+    abort "Failed!" unless $?.success?
+  end
 end
 
 desc "benchmark monitor.log against the monitor parsing"
