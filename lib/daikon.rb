@@ -6,6 +6,12 @@ require 'set'
 require 'socket'
 require 'stringio'
 require 'thread'
+begin
+  require 'psych'
+rescue LoadError
+  # Ignore
+end
+require 'yaml'
 
 require 'em-hiredis'
 require 'em-http-request'

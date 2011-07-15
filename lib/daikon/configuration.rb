@@ -37,14 +37,29 @@ module Daikon
     def parse
       FLAGS.each_with_index do |flag, flag_index|
         argv_index = @argv.index(flag)
+        option_variable_name = OPTIONS[flag_index]
+        default_value = DEFAULTS[flag_index]
+        current_value = send(option_variable_name)
+
         value = if argv_index
                   @argv[argv_index + 1]
+                elsif yaml_config[option_variable_name]
+                  yaml_config[option_variable_name]
                 else
-                  DEFAULTS[flag_index]
+                  default_value
                 end
 
-        send "#{OPTIONS[flag_index]}=", value
+        send "#{option_variable_name}=", value
       end
+    end
+
+    def yaml_config
+      @yaml_config ||= begin
+                         loaded_yaml = YAML.load_file('daikon.yml')
+                         loaded_yaml['daikon']
+                       rescue Errno::ENOENT
+                         {}
+                       end
     end
   end
 end

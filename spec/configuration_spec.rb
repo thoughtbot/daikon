@@ -64,3 +64,51 @@ describe Daikon::Configuration do
     end
   end
 end
+
+describe Daikon::Configuration, "with daikon.yml with 1 redis" do
+  let(:api_key){ "magic_key" }
+  let(:redis_url){ "redis://0.0.0.0:6380" }
+  let(:server_prefix){ "orange" }
+  let(:yaml) do
+    <<-YML
+---
+daikon:
+  api_key: #{api_key}
+  redis_url: #{redis_url}
+  server_prefix: #{server_prefix}
+  YML
+  end
+
+  before do
+    open('daikon.yml', 'w+'){ |f| f.write(yaml) }
+  end
+
+  after do
+    File.delete('daikon.yml')
+  end
+
+  it "reads options from daikon.yml" do
+    configuration = Daikon::Configuration.new
+    configuration.api_key.should       == api_key
+    configuration.redis_url.should     == redis_url
+    configuration.server_prefix.should == server_prefix
+  end
+
+  it "prefers api_key from ARGV" do
+    api_key_from_argv = 'a_different_key'
+    configuration = Daikon::Configuration.new(['-k', api_key_from_argv])
+    configuration.api_key.should == api_key_from_argv
+  end
+
+  it "prefers redis_url from ARGV" do
+    redis_url_from_argv = 'redis://0.0.0.0:5000'
+    configuration = Daikon::Configuration.new(['-u', redis_url_from_argv])
+    configuration.redis_url.should == redis_url_from_argv
+  end
+
+  it "prefers server_prefix from ARGV" do
+    server_prefix_from_argv = 'my_prefix'
+    configuration = Daikon::Configuration.new(['-s', server_prefix_from_argv])
+    configuration.server_prefix.should == server_prefix_from_argv
+  end
+end
