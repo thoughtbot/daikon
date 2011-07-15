@@ -1,5 +1,6 @@
 source "http://rubygems.org"
 
+gem "rake",      "~> 0.9"
 gem "daemons",   "~> 1.1.0"
 gem "excon",     "~> 0.5"
 gem "json_pure", "~> 1.4.6"

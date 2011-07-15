@@ -2,14 +2,15 @@
 
 source "http://rubygems.org"
 
+gem "bourne"
+gem "rake", "~> 0.9"
+gem "rspec"
+gem "timecop"
+gem "aruba"
 gem "daemons", "~> 1.1.0"
 gem "excon", "~> 0.5"
 gem "json_pure", "~> 1.4.6"
 gem "redis", "~> 2.1"
 gem "appraisal", "~> 0.3.5"
-gem "aruba"
-gem "bourne"
 gem "cucumber"
-gem "rspec"
-gem "timecop"
 
